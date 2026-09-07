@@ -1,10 +1,15 @@
 <?php // php/conexao.php
-$servidor = 'localhost:3307';
+$servidor = 'mysql';
 $usuario = 'root';
-$senha = ''; // vazia no XAMPP padrão
+$senha = 'root'; // vazia no XAMPP padrão
 $nome_banco = 'gennus_database';
 
-$conexao = new mysqli($servidor, $usuario, $senha, $nome_banco);
+$conexao = new mysqli(
+    $servidor,
+    $usuario,
+    $senha,
+    $nome_banco
+    );
 
 if ($conexao->connect_error) {
     header('Content-type: application/json; charset=utf-8');

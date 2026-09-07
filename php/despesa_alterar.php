@@ -3,7 +3,7 @@ include_once('conexao.php');
 $retorno = ['status'=>'', 'mensagem'=>'', 'data'=>[]];
 
 if (isset($_GET['id'])) {
-    $stmt = $conexao->prepare('UPDATE despesas SET descricao=?, valor=?,WHERE id=?');
+    $stmt = $conexao->prepare('UPDATE despesas SET descricao=?, valor=? WHERE id=?');
     // 'sdsi' = String, Double, String, Inteiro
     $stmt->bind_param('sdi', $_POST['descricao'], $_POST['valor'], $_GET['id']);
     $stmt->execute();
