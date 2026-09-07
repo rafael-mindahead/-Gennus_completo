@@ -50,6 +50,15 @@ struct ProdutosView: View {
                             )
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            if produto.estoque <= 5 {
+
+                                Label(
+                                    "Estoque baixo",
+                                    systemImage: "exclamationmark.triangle.fill"
+                                )
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.warning)
+                            }
                         }
                     }
                 }

@@ -1,7 +1,9 @@
-//
-//  Cliente.swift
-//  GennusIOS
-//
-//  Created by rafael alves on 07/09/26.
-//
+import Foundation
 
+struct Cliente: Codable, Identifiable {
+    let id: Int
+    let nome: String
+    let email: String?
+    let telefone: String?
+    let documento: String?
+}

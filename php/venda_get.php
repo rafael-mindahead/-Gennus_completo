@@ -15,7 +15,15 @@ $tabela = [];
 
 if ($resultado->num_rows > 0) {
     while ($linha = $resultado->fetch_assoc()) {
-        $tabela[] = $linha;
+
+    $linha['id'] = (int) $linha['id'];
+    $linha['produto_id'] = (int) $linha['produto_id'];
+
+    $linha['qtd'] = (float) $linha['qtd'];
+    $linha['valor_total'] = (float) $linha['valor_total'];
+    $linha['custo_total'] = (float) $linha['custo_total'];
+
+    $tabela[] = $linha;
     }
     $retorno['status'] = 'ok';
     $retorno['data'] = $tabela;
