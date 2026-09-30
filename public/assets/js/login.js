@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             console.error("Erro no login:", error);
-            alert("Falha na conexão com o servidor.");
+            Gennus.report(error);
         }
     });
 });

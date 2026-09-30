@@ -145,7 +145,7 @@ CREATE TABLE cliente (
 -- ============================================================
 -- DADOS DE DESENVOLVIMENTO
 -- ============================================================
--- ATENÇÃO: o PHP atual ainda compara a senha diretamente.
+-- Senhas novas usam hash; o login migra senhas antigas após autenticação.
 -- Este usuário é SOMENTE para ambiente local de desenvolvimento.
 -- Login: admin@gennus.local
 -- Senha: admin123
@@ -153,7 +153,7 @@ INSERT INTO usuarios
     (nome, sobrenome, email_corporativo, telefone, cpf_cnpj, senha_hash)
 VALUES
     ('Admin', 'Gennus', 'admin@gennus.local', '(41) 99999-0000',
-     '00.000.000/0001-00', 'admin123');
+     '00.000.000/0001-00', '$2y$10$UahhNagvyJWXQakg.yZ0GeFCZ/Za4qwHMV8tc1Jw6UGjSy51wW8Aa');
 
 INSERT INTO clientes (nome, email, telefone, documento) VALUES
     ('Cliente Demonstração', 'cliente@gennus.local', '(41) 98888-0001', '111.222.333-44'),
@@ -186,5 +186,3 @@ VALUES
 UPDATE produtos SET estoque = estoque - 1.000 WHERE id = 1;
 UPDATE produtos SET estoque = estoque - 2.000 WHERE id = 2;
 UPDATE produtos SET estoque = estoque - 3.000 WHERE id = 3;
-
-SELECT * FROM usuarios;

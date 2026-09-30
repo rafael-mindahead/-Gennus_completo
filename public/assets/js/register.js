@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             console.error("Erro no cadastro:", error);
-            alert("Falha na conexão com o servidor.");
+            Gennus.report(error);
         }
     });
 });
