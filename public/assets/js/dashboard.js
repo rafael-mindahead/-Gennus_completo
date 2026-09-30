@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         // Preenche os dados do usuário na tela
-        const user = jsonSessao.data[0]; 
+        const user = jsonSessao.data; 
         // Assumindo que a coluna no seu banco seja "nome"
         document.getElementById("side-user-name").textContent = user.nome;
         document.getElementById("user-initials").textContent = user.nome.charAt(0).toUpperCase();
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnSair) {
         btnSair.addEventListener('click', async (e) => {
             e.preventDefault(); // Evita o redirecionamento padrão do link
-            await fetch('/php/cliente_logoff.php');
+            await fetch('/php/cliente_logoff.php', {method: 'POST'});
             window.location.href = '/pages/auth/login.html';
         });
     }
