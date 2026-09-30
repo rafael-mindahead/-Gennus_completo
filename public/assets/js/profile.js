@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await fetch('/php/valida_sessao.php');
+        const response = await Gennus.fetch('/php/valida_sessao.php');
         const result = await response.json();
         if (result.status !== 'ok') {
             window.location.href = '/pages/auth/login.html';
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 form.append('nome', parts.shift() || '');
                 form.append('sobrenome', parts.join(' '));
                 form.append('senha', document.getElementById('edit-password').value);
-                const response = await fetch('/php/usuario_alterar.php', {method: 'POST', body: form});
+                const response = await Gennus.fetch('/php/usuario_alterar.php', {method: 'POST', body: form});
                 const result = await response.json();
                 if (result.status !== 'ok') throw new Error(result.mensagem);
                 alert(result.mensagem);

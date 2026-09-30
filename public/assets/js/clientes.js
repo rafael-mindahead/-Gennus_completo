@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // READ: Busca clientes do banco e renderiza
     async function renderizarClientes() {
-        const retorno = await fetch('/php/cliente_get.php');
+        const retorno = await Gennus.fetch('/php/cliente_get.php');
         const resposta = await retorno.json();
 
         listaHtml.innerHTML = "";
@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
             resposta.data.forEach((cli) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td>${cli.nome}</td>
-                    <td>${cli.email}</td>
-                    <td>${cli.telefone}</td>
-                    <td>${cli.documento}</td>
+                    <td>${Gennus.escape(cli.nome)}</td>
+                    <td>${Gennus.escape(cli.email)}</td>
+                    <td>${Gennus.escape(cli.telefone)}</td>
+                    <td>${Gennus.escape(cli.documento)}</td>
                     <td>
                         <button class="btn-edit" onclick="editarCliente(${cli.id})">Editar</button>
                         <button class="btn-delete" onclick="excluirCliente(${cli.id})">Excluir</button>
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             url = `/php/cliente_alterar.php?id=${id}`;
         }
 
-        const retorno = await fetch(url, { method: 'POST', body: fd });
+        const retorno = await Gennus.fetch(url, { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Função global para carregar dados para edição (GET 1 registro)
     window.editarCliente = async (id) => {
-        const retorno = await fetch('/php/cliente_get.php?id=' + id);
+        const retorno = await Gennus.fetch('/php/cliente_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE: Excluir cliente
     window.excluirCliente = async (id) => {
         if (confirm("Deseja realmente excluir este cliente?")) {
-            const retorno = await fetch('/php/cliente_excluir.php?id=' + id);
+            const retorno = await Gennus.fetch('/php/cliente_excluir.php?id=' + id, {method: 'POST'});
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {

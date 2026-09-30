@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // 1. VALIDAÇÃO DE SESSÃO E CARREGAMENTO DO USUÁRIO
     try {
-        const respSessao = await fetch('/php/valida_sessao.php');
+        const respSessao = await Gennus.fetch('/php/valida_sessao.php');
         const jsonSessao = await respSessao.json();
 
         if (jsonSessao.status === 'nok') {
@@ -19,17 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("welcome-title").textContent = `Dashboard — ${user.nome}`;
 
     } catch (error) {
-        console.error("Erro na sessão:", error);
-    }
-
-    // 2. LOGOFF (Sair do Sistema)
-    const btnSair = document.querySelector('.sidebar-footer a[href="/pages/auth/login.html"]');
-    if (btnSair) {
-        btnSair.addEventListener('click', async (e) => {
-            e.preventDefault(); // Evita o redirecionamento padrão do link
-            await fetch('/php/cliente_logoff.php', {method: 'POST'});
-            window.location.href = '/pages/auth/login.html';
-        });
+        Gennus.report(error);
+        return;
     }
 
     // 3. BUSCAR DADOS REAIS DO BANCO DE DADOS EM PARALELO
@@ -39,9 +30,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const [resVendas, resFuncs, resManuais] = await Promise.all([
-            fetch('/php/venda_get.php').then(r => r.json()),
-            fetch('/php/funcionario_get.php').then(r => r.json()),
-            fetch('/php/despesa_get.php').then(r => r.json())
+            Gennus.fetch('/php/venda_get.php').then(r => r.json()),
+            Gennus.fetch('/php/funcionario_get.php').then(r => r.json()),
+            Gennus.fetch('/php/despesa_get.php').then(r => r.json())
         ]);
 
         if (resVendas.status === 'ok') vendas = resVendas.data;
@@ -49,7 +40,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (resManuais.status === 'ok') manuais = resManuais.data;
 
     } catch (error) {
-        console.error("Erro ao carregar dados do dashboard:", error);
+        Gennus.report(error);
+        return;
     }
 
     // 4. CÁLCULOS

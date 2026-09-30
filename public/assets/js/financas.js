@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 1. BUSCAR FUNCIONÁRIOS DO BANCO (Substitui o localStorage)
         try {
-            const respFunc = await fetch('/php/funcionario_get.php');
+            const respFunc = await Gennus.fetch('/php/funcionario_get.php');
             const dataFunc = await respFunc.json();
             
             if (dataFunc.status === 'ok') {
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     somaTotal += valor;
                     listaHtml.innerHTML += `
                         <tr>
-                            <td>Salário: ${f.nome}</td>
+                            <td>Salário: ${Gennus.escape(f.nome)}</td>
                             <td style="color: #666">Automático</td>
                             <td class="txt-vermelho">R$ ${valor.toFixed(2)}</td>
                             <td><small>Não editável</small></td>
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 2. BUSCAR GASTOS MANUAIS DO BANCO
         try {
-            const retorno = await fetch('/php/despesa_get.php');
+            const retorno = await Gennus.fetch('/php/despesa_get.php');
             const resposta = await retorno.json();
 
             if (resposta.status === 'ok') {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     // AQUI A CORREÇÃO: g.descricao aparece na primeira coluna
                     listaHtml.innerHTML += `
                         <tr>
-                            <td>${g.descricao}</td>
+                            <td>${Gennus.escape(g.descricao)}</td>
                             <td style="color: var(--roxo)">Manual</td>
                             <td class="txt-vermelho">R$ ${parseFloat(g.valor).toFixed(2)}</td>
                             <td>
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let url = '/php/despesa_novo.php'; 
         if (id !== "") url = `/php/despesa_alterar.php?id=${id}`;
 
-        const retorno = await fetch(url, { method: 'POST', body: fd });
+        const retorno = await Gennus.fetch(url, { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.editarGasto = async (id) => {
-        const retorno = await fetch('/php/despesa_get.php?id=' + id);
+        const retorno = await Gennus.fetch('/php/despesa_get.php?id=' + id);
         const resposta = await retorno.json();
         if (resposta.status === 'ok') {
             const g = resposta.data[0];
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.excluirGasto = async (id) => {
         if (confirm("Remover esta despesa?")) {
-            const retorno = await fetch('/php/despesa_excluir.php?id=' + id);
+            const retorno = await Gennus.fetch('/php/despesa_excluir.php?id=' + id, {method: 'POST'});
             const resposta = await retorno.json();
             if(resposta.status === 'ok') renderizar();
             else alert("Erro: " + resposta.mensagem);

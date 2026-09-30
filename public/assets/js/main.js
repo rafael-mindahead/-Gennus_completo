@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     },
     {
-      threshould: 0.2, //20% do elemento vai precisar aparecer pra ativar
+      threshold: 0.2, //20% do elemento vai precisar aparecer pra ativar
     },
   );
 
@@ -55,7 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const targetId = this.getAttribute("href");
 
       // Seleciona o elemento destino
+      if (!targetId || targetId === "#") return;
       const targetElement = document.querySelector(targetId);
+      if (!targetElement) return;
 
       // Faz o scroll suave até ele
       targetElement.scrollIntoView({

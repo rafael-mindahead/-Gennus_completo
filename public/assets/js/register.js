@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append('senha', document.getElementById('reg-password').value);
 
         try {
-            const retorno = await fetch('/php/usuario_novo.php', {
+            const retorno = await Gennus.fetch('/php/usuario_novo.php', {
                 method: 'POST',
                 body: fd
             });

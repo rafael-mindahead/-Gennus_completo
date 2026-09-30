@@ -3,14 +3,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 1. VALIDAÇÃO DE SESSÃO
     // Impede que alguém acesse os relatórios sem estar logado
     try {
-        const respSessao = await fetch('/php/valida_sessao.php');
+        const respSessao = await Gennus.fetch('/php/valida_sessao.php');
         const jsonSessao = await respSessao.json();
         if (jsonSessao.status === 'nok') {
             window.location.href = '/pages/auth/login.html';
             return;
         }
     } catch (error) {
-        console.error("Erro na sessão:", error);
+        Gennus.report(error);
+        return;
     }
 
     // 2. RECUPERAÇÃO DE DADOS EM PARALELO DO PHP
@@ -21,10 +22,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const [resVendas, resFuncs, resManuais, resProds] = await Promise.all([
-            fetch('/php/venda_get.php').then(r => r.json()),
-            fetch('/php/funcionario_get.php').then(r => r.json()),
-            fetch('/php/despesa_get.php').then(r => r.json()),
-            fetch('/php/produto_get.php').then(r => r.json())
+            Gennus.fetch('/php/venda_get.php').then(r => r.json()),
+            Gennus.fetch('/php/funcionario_get.php').then(r => r.json()),
+            Gennus.fetch('/php/despesa_get.php').then(r => r.json()),
+            Gennus.fetch('/php/produto_get.php').then(r => r.json())
         ]);
 
         if (resVendas.status === 'ok') vendas = resVendas.data;
@@ -33,7 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (resProds.status === 'ok') produtos = resProds.data;
 
     } catch (error) {
-        console.error("Erro ao carregar dados para os gráficos:", error);
+        Gennus.report(error);
+        return;
     }
 
     // 3. CÁLCULOS TOTAIS (convertendo strings do banco para Float)

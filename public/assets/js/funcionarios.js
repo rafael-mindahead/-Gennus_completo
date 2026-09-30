@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         div.innerHTML = `
             <div style="flex: 1;">
-                <input type="text" class="extra-benefit" value="${valor}" placeholder="Ex: Gympass: R$ 50,00" style="width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; color: #fff;">
+                <input type="text" class="extra-benefit" value="${Gennus.escape(valor)}" placeholder="Ex: Gympass: R$ 50,00" style="width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; color: #fff;">
             </div>
             <button type="button" class="btn-remove" style="background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); padding: 10px; border-radius: 8px; cursor: pointer;">✕</button>
         `;
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listaHtml) return;
         listaHtml.innerHTML = "";
 
-        const retorno = await fetch('/php/funcionario_get.php');
+        const retorno = await Gennus.fetch('/php/funcionario_get.php');
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -52,11 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const tr = document.createElement("tr");
                 // CORREÇÃO: Adicionada a coluna de salário base abaixo
                 tr.innerHTML = `
-                    <td>${f.nome}</td>
-                    <td>${f.tipo_contrato}</td>
-                    <td>${f.documento}</td>
+                    <td>${Gennus.escape(f.nome)}</td>
+                    <td>${Gennus.escape(f.tipo_contrato)}</td>
+                    <td>${Gennus.escape(f.documento)}</td>
                     <td>R$ ${parseFloat(f.salario_base).toFixed(2)}</td> 
-                    <td>${f.status}</td>
+                    <td>${Gennus.escape(f.status)}</td>
                     <td>
                         <button onclick="editar(${f.id})" style="background:none; border:none; color:var(--roxo); cursor:pointer; font-weight:600;">Editar</button>
                         <button onclick="excluir(${f.id})" style="background:none; border:none; color:var(--vermelho); cursor:pointer; font-weight:600; margin-left:10px;">Excluir</button>
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             url = `/php/funcionario_alterar.php?id=${id}`;
         }
 
-        const retorno = await fetch(url, { method: 'POST', body: fd });
+        const retorno = await Gennus.fetch(url, { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("btn-salvar").textContent = "Salvar Funcionário";
             extraBenefitsContainer.innerHTML = "";
             form.reset();
+            tipoContrato.dispatchEvent(new Event("change"));
             renderizar();
             alert("Dados salvos com sucesso!");
         } else {
@@ -108,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // GET 1 Registro para Edição
     window.editar = async (id) => {
-        const retorno = await fetch('/php/funcionario_get.php?id=' + id);
+        const retorno = await Gennus.fetch('/php/funcionario_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -116,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("func-id").value = f.id;
             document.getElementById("nome").value = f.nome;
             document.getElementById("tipo-contrato").value = f.tipo_contrato;
+            tipoContrato.dispatchEvent(new Event("change"));
             document.getElementById("documento").value = f.documento;
             document.getElementById("salario").value = f.salario_base;
             document.getElementById("status").value = f.status;
@@ -124,7 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             extraBenefitsContainer.innerHTML = "";
             if (f.extras) {
-                const extrasArray = JSON.parse(f.extras);
+                const parsed = typeof f.extras === "string" ? JSON.parse(f.extras) : f.extras;
+                const extrasArray = Array.isArray(parsed) ? parsed : [];
                 extrasArray.forEach(beneficio => criarLinhaBeneficio(beneficio));
             }
 
@@ -136,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE
     window.excluir = async (id) => {
         if(confirm("Deseja realmente excluir este funcionário?")) {
-            const retorno = await fetch('/php/funcionario_excluir.php?id=' + id);
+            const retorno = await Gennus.fetch('/php/funcionario_excluir.php?id=' + id, {method: 'POST'});
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {

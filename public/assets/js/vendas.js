@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarProdutos() {
         if (!selectProd) return;
         
-        const retorno = await fetch('/php/produto_get.php');
+        const retorno = await Gennus.fetch('/php/produto_get.php');
         const resposta = await retorno.json();
 
         selectProd.innerHTML = '<option value="">Selecione um produto</option>';
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
             produtosDisponiveis.forEach(p => {
                 if (parseFloat(p.estoque) > 0) {
                     // Usamos o ID real do banco como value
-                    selectProd.innerHTML += `<option value="${p.id}">${p.nome} (Disp: ${p.estoque} ${p.unidade})</option>`;
+                    selectProd.innerHTML += `<option value="${p.id}">${Gennus.escape(p.nome)} (Disp: ${p.estoque} ${Gennus.escape(p.unidade)})</option>`;
                 }
             });
         }
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listaVendasHtml) return;
         listaVendasHtml.innerHTML = "";
 
-        const retorno = await fetch('/php/venda_get.php');
+        const retorno = await Gennus.fetch('/php/venda_get.php');
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -39,12 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
             
             recentes.forEach(v => {
                 // Formata a data vinda do MySQL (YYYY-MM-DD HH:MM:SS) para o formato local
-                const dataFormatada = new Date(v.data_venda).toLocaleString('pt-BR');
+                const dataFormatada = new Date(v.data_venda.replace(' ', 'T')).toLocaleString('pt-BR');
                 
                 listaVendasHtml.innerHTML += `
                     <tr>
-                        <td>${v.produto_nome}</td>
-                        <td>${parseFloat(v.qtd).toFixed(2)} ${v.unidade}</td>
+                        <td>${Gennus.escape(v.produto_nome)}</td>
+                        <td>${parseFloat(v.qtd).toFixed(2)} ${Gennus.escape(v.unidade)}</td>
                         <td>R$ ${parseFloat(v.valor_total).toFixed(2)}</td>
                         <td>${dataFormatada}</td>
                     </tr>
@@ -65,6 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Encontra os dados completos do produto selecionado
         const produto = produtosDisponiveis.find(p => p.id == idProd);
 
+        if (!produto || !Number.isFinite(qtdVendida) || qtdVendida <= 0) return alert("Informe um produto e uma quantidade válida.");
+
         if (qtdVendida > parseFloat(produto.estoque)) {
             alert("Erro: Estoque insuficiente!");
             return;
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("valor_total", valorTotal);
         fd.append("custo_total", custoTotal);
 
-        const retorno = await fetch('/php/venda_novo.php', { method: 'POST', body: fd });
+        const retorno = await Gennus.fetch('/php/venda_novo.php', { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {

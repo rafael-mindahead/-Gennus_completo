@@ -8,17 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
         listaHtml.innerHTML = "";
 
         try {
-            const retorno = await fetch('/php/produto_get.php');
+            const retorno = await Gennus.fetch('/php/produto_get.php');
             const resposta = await retorno.json();
 
             if (resposta.status === 'ok') {
                 resposta.data.forEach((p) => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${p.nome}</td>
+                        <td>${Gennus.escape(p.nome)}</td>
                         <td>R$ ${parseFloat(p.custo).toFixed(2)}</td>
                         <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-                        <td>${parseFloat(p.estoque).toFixed(2)} ${p.unidade}</td>
+                        <td>${parseFloat(p.estoque).toFixed(2)} ${Gennus.escape(p.unidade)}</td>
                         <td>
                             <button onclick="editarProd(${p.id})" style="color:var(--roxo); background:none; border:none; cursor:pointer; font-weight:600;">Editar</button>
                             <button onclick="excluirProd(${p.id})" style="color:var(--vermelho); background:none; border:none; cursor:pointer; margin-left:10px; font-weight:600;">Excluir</button>
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("gennus_prods", JSON.stringify(resposta.data));
             }
         } catch (error) {
-            console.error("Erro ao carregar produtos:", error);
+            Gennus.report(error);
         }
     }
 
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             url = `/php/produto_alterar.php?id=${id}`;
         }
 
-        const retorno = await fetch(url, { method: 'POST', body: fd });
+        const retorno = await Gennus.fetch(url, { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // GET 1 REGISTRO: Puxar os dados para editar
     window.editarProd = async (id) => {
-        const retorno = await fetch('/php/produto_get.php?id=' + id);
+        const retorno = await Gennus.fetch('/php/produto_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -78,7 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("prod-id").value = p.id;
             document.getElementById("prod-nome").value = p.nome;
             document.getElementById("prod-categoria").value = p.categoria || "";
-            document.getElementById("prod-unidade").value = p.unidade || "un";
+            const units = document.getElementById("prod-unidade");
+            if (!Array.from(units.options).some(option => option.value === p.unidade)) {
+                const option = document.createElement("option");
+                option.value = p.unidade;
+                option.textContent = p.unidade;
+                units.appendChild(option);
+            }
+            units.value = p.unidade;
             document.getElementById("prod-custo").value = p.custo;
             document.getElementById("prod-preco").value = p.preco;
             document.getElementById("prod-estoque").value = p.estoque;
@@ -91,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE: Excluir o produto
     window.excluirProd = async (id) => {
         if(confirm("Excluir este produto?")) {
-            const retorno = await fetch('/php/produto_excluir.php?id=' + id);
+            const retorno = await Gennus.fetch('/php/produto_excluir.php?id=' + id, {method: 'POST'});
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {
