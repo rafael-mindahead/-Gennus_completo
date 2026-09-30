@@ -7,50 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
         listaHtml.innerHTML = "";
         let somaTotal = 0;
 
-        // 1. BUSCAR FUNCIONÁRIOS DO BANCO (Substitui o localStorage)
-        try {
-            const respFunc = await Gennus.fetch('/php/funcionario_get.php');
-            const dataFunc = await respFunc.json();
-            
-            if (dataFunc.status === 'ok') {
-                dataFunc.data.forEach(f => {
-                    const valor = parseFloat(f.salario_base) || 0;
-                    somaTotal += valor;
-                    listaHtml.innerHTML += `
-                        <tr>
-                            <td>Salário: ${Gennus.escape(f.nome)}</td>
-                            <td style="color: #666">Automático</td>
-                            <td class="txt-vermelho">R$ ${valor.toFixed(2)}</td>
-                            <td><small>Não editável</small></td>
-                        </tr>
-                    `;
-                });
-            }
-        } catch (e) { console.error("Erro ao carregar funcionários:", e); }
-
-        // 2. BUSCAR GASTOS MANUAIS DO BANCO
-        try {
-            const retorno = await Gennus.fetch('/php/despesa_get.php');
-            const resposta = await retorno.json();
-
-            if (resposta.status === 'ok') {
-                resposta.data.forEach((g) => {
-                    somaTotal += parseFloat(g.valor);
-                    // AQUI A CORREÇÃO: g.descricao aparece na primeira coluna
-                    listaHtml.innerHTML += `
-                        <tr>
-                            <td>${Gennus.escape(g.descricao)}</td>
-                            <td style="color: var(--roxo)">Manual</td>
-                            <td class="txt-vermelho">R$ ${parseFloat(g.valor).toFixed(2)}</td>
-                            <td>
-                                <button onclick="editarGasto(${g.id})" style="background:none; border:none; color:var(--roxo); cursor:pointer;">Editar</button>
-                                <button onclick="excluirGasto(${g.id})" style="background:none; border:none; color:var(--vermelho); cursor:pointer; margin-left:10px;">Excluir</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        } catch (error) { console.error("Erro ao buscar despesas:", error); }
+        const snapshot = await Gennus.finance.load();
+        const salaries = snapshot.funcionarios.filter(func => func.status === 'Ativo');
+        salaries.forEach(func => {
+            listaHtml.innerHTML += `<tr><td>Salário: ${Gennus.escape(func.nome)}</td><td>Automático</td><td class="txt-vermelho">R$ ${Number(func.salario_base).toFixed(2)}</td><td><small>Não editável</small></td></tr>`;
+        });
+        listaHtml.innerHTML += `<tr><td>Custo dos produtos vendidos</td><td>Automático</td><td class="txt-vermelho">R$ ${snapshot.totals.estoque.toFixed(2)}</td><td><small>Não editável</small></td></tr>`;
+        snapshot.despesas.forEach(g => {
+            listaHtml.innerHTML += `<tr><td>${Gennus.escape(g.descricao)}</td><td>Manual</td><td class="txt-vermelho">R$ ${Number(g.valor).toFixed(2)}</td><td><button onclick="editarGasto(${g.id})">Editar</button> <button onclick="excluirGasto(${g.id})">Excluir</button></td></tr>`;
+        });
+        somaTotal = snapshot.totals.despesas;
 
         totalGeralHtml.textContent = somaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }

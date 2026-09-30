@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const custoEstoque = vendas.reduce((acc, v) => acc + (parseFloat(v.custo_total) || 0), 0);
     
     // O banco de dados retorna string, então garantimos o parseFloat
-    const totalSalarios = funcs.reduce((acc, f) => acc + (parseFloat(f.salario_base) || 0), 0);
+    const totalSalarios = funcs.filter(f => f.status === "Ativo").reduce((acc, f) => acc + (parseFloat(f.salario_base) || 0), 0);
     const outrosGastos = manuais.reduce((acc, g) => acc + (parseFloat(g.valor) || 0), 0);
 
     const despesasTotais = custoEstoque + totalSalarios + outrosGastos;
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 labels: ['Estoque', 'Equipe', 'Manuais'],
                 datasets: [{
                     // Adicionado um pequeno ternário para o gráfico não sumir se tudo for zero
-                    data: [custoEstoque || 0.1, totalSalarios || 0.1, outrosGastos || 0.1],
+                    data: [custoEstoque, totalSalarios, outrosGastos],
                     backgroundColor: ['#a855f7', '#7e22ce', '#3b0764'],
                     borderWidth: 0
                 }]
@@ -92,10 +92,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         new Chart(ctxLinha, {
             type: 'line',
             data: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                labels: Gennus.finance.daily(vendas).labels,
                 datasets: [{
-                    label: 'Vendas Acumuladas (R$)',
-                    data: [0, 0, 0, 0, 0, 0, receitaTotal],
+                    label: 'Vendas por dia (R$)',
+                    data: Gennus.finance.daily(vendas).values,
                     borderColor: '#a855f7',
                     backgroundColor: 'rgba(168, 85, 247, 0.1)',
                     fill: true,

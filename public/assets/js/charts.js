@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 3. CÁLCULOS TOTAIS (convertendo strings do banco para Float)
     const totalVendas = vendas.reduce((acc, v) => acc + (parseFloat(v.valor_total) || 0), 0);
     const custoProd = vendas.reduce((acc, v) => acc + (parseFloat(v.custo_total) || 0), 0);
-    const salarios = funcs.reduce((acc, f) => acc + (parseFloat(f.salario_base) || 0), 0);
+    const salarios = funcs.filter(f => f.status === "Ativo").reduce((acc, f) => acc + (parseFloat(f.salario_base) || 0), 0);
     const totalManuais = manuais.reduce((acc, g) => acc + (parseFloat(g.valor) || 0), 0);
 
     // 1. GRÁFICO DOUGHNUT (CUSTOS)
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             labels: ['Estoque', 'Salários', 'Manuais'],
             datasets: [{
                 // Tratativa para não quebrar o gráfico se for 0
-                data: [custoProd || 0.1, salarios || 0.1, totalManuais || 0.1],
+                data: [custoProd, salarios, totalManuais],
                 backgroundColor: ['#a855f7', '#7e22ce', '#3b0764'],
                 borderWidth: 0,
                 cutout: '80%'
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const d = new Date();
         d.setDate(d.getDate() - i);
         // Usa o formato ISO curto: YYYY-MM-DD para bater com o banco
-        const isoDate = d.toISOString().split('T')[0]; 
+        const isoDate = Gennus.finance.localDate(d); 
         ultimos7Dias[isoDate] = 0;
     }
     
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // 3. GRÁFICO DE BARRAS (CATEGORIAS)
-    const catMap = {};
+    const catMap = Object.create(null);
     vendas.forEach(v => {
         // Encontra o produto vendido no array de produtos pelo ID
         const pOriginal = produtos.find(p => p.id == v.produto_id);
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             labels: ['Vendas', 'Equipe', 'Estoque', 'Margem', 'Manuais'],
             datasets: [{
                 label: 'Score Operacional',
-                data: [scoreVendas || 0, scoreEquipe || 0, scoreEstoque || 0, Math.max(0, scoreMargem), 50],
+                data: [scoreVendas || 0, scoreEquipe || 0, scoreEstoque || 0, Math.max(0, scoreMargem), totalVendas > 0 ? Math.min(100, totalManuais / totalVendas * 100) : 0],
                 backgroundColor: 'rgba(168, 85, 247, 0.2)',
                 borderColor: '#a855f7',
                 pointBackgroundColor: '#a855f7'
@@ -155,5 +155,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ATUALIZAR INSIGHTS
     const fmt = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('proj-lucro').textContent = fmt(totalVendas * 1.2); // Projeção +20%
+    document.getElementById('proj-lucro').textContent = fmt((totalVendas - custoProd - salarios - totalManuais) * 1.2); // Projeção +20%
 });
