@@ -1,84 +1,61 @@
 import Foundation
 
-struct APIResponse<T: Codable>: Codable {
+struct APIResponse<T: Decodable>: Decodable {
     let status: String
     let mensagem: String
     let data: T
 }
 
-final class APIService {
+private struct APIErrorResponse: Decodable {
+    let status: String
+    let mensagem: String
+}
 
+private struct APIError: LocalizedError {
+    let message: String
+    var errorDescription: String? { message }
+}
+
+final class APIService {
     static let shared = APIService()
 
-    private let baseURL = "http://127.0.0.1:8080/php"
+    // localhost aponta para o Mac no simulador. Para um aparelho, use o endereço do servidor.
+    private let baseURL = "http://localhost:8080/php"
 
     private init() {}
 
-    func buscarProdutos() async throws -> [Produto] {
-
-        guard let url = URL(
-            string: "\(baseURL)/produto_get.php"
-        ) else {
+    private func buscar<T: Decodable>(_ endpoint: String) async throws -> T {
+        guard let url = URL(string: "\(baseURL)/\(endpoint)") else {
             throw URLError(.badURL)
         }
-
-        let (data, response) = try await URLSession.shared.data(from: url)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
+        if let error = try? JSONDecoder().decode(APIErrorResponse.self, from: data), error.status != "ok" {
+            throw APIError(message: error.mensagem)
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw APIError(message: "Servidor retornou HTTP \(http.statusCode).")
+        }
+        let result = try JSONDecoder().decode(APIResponse<T>.self, from: data)
+        guard result.status == "ok" else {
+            throw APIError(message: result.mensagem)
+        }
+        return result.data
+    }
 
-        let resposta = try JSONDecoder().decode(
-            APIResponse<[Produto]>.self,
-            from: data
-        )
-
-        return resposta.data
+    func buscarProdutos() async throws -> [Produto] {
+        try await buscar("produto_get.php")
     }
 
     func buscarClientes() async throws -> [Cliente] {
-
-        guard let url = URL(
-            string: "\(baseURL)/cliente_get.php"
-        ) else {
-            throw URLError(.badURL)
-        }
-
-        let (data, response) = try await URLSession.shared.data(from: url)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
-        }
-
-        let resposta = try JSONDecoder().decode(
-            APIResponse<[Cliente]>.self,
-            from: data
-        )
-
-        return resposta.data
+        try await buscar("cliente_get.php")
     }
+
     func buscarVendas() async throws -> [Venda] {
-
-        guard let url = URL(
-            string: "\(baseURL)/venda_get.php"
-        ) else {
-            throw URLError(.badURL)
-        }
-
-        let (data, response) = try await URLSession.shared.data(from: url)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
-        }
-
-        let resposta = try JSONDecoder().decode(
-            APIResponse<[Venda]>.self,
-            from: data
-        )
-
-        return resposta.data
+        try await buscar("venda_get.php")
     }
 }

@@ -12,6 +12,7 @@ struct DashboardView: View {
     @State private var vendas: [Venda] = []
 
     @State private var carregando = true
+    @State private var erro: String?
 
     var body: some View {
 
@@ -22,6 +23,13 @@ struct DashboardView: View {
                 AppTheme.background
                     .ignoresSafeArea()
 
+                if carregando {
+                    ProgressView("Carregando dados...")
+                } else if let erro {
+                    Text(erro)
+                        .foregroundStyle(AppTheme.danger)
+                        .padding()
+                } else {
                 ScrollView {
 
                     VStack(
@@ -152,6 +160,7 @@ struct DashboardView: View {
                     }
                     .padding()
                 }
+                }
             }
             .navigationTitle("Dashboard")
             .task {
@@ -236,7 +245,10 @@ struct DashboardView: View {
 
     // MARK: - API
 
+    @MainActor
     private func carregarDashboard() async {
+        carregando = true
+        erro = nil
 
         do {
 
@@ -282,9 +294,7 @@ struct DashboardView: View {
 
         } catch {
 
-            print(
-                "Erro ao carregar Dashboard: \(error)"
-            )
+            erro = error.localizedDescription
         }
 
         carregando = false
