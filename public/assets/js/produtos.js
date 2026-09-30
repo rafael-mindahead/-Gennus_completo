@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         listaHtml.innerHTML = "";
 
         try {
-            const retorno = await fetch('php/produto_get.php');
+            const retorno = await fetch('/php/produto_get.php');
             const resposta = await retorno.json();
 
             if (resposta.status === 'ok') {
@@ -49,9 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("preco", document.getElementById("prod-preco").value);
         fd.append("estoque", document.getElementById("prod-estoque").value);
 
-        let url = 'php/produto_novo.php';
+        let url = '/php/produto_novo.php';
         if (id !== "") {
-            url = `php/produto_alterar.php?id=${id}`;
+            url = `/php/produto_alterar.php?id=${id}`;
         }
 
         const retorno = await fetch(url, { method: 'POST', body: fd });
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // GET 1 REGISTRO: Puxar os dados para editar
     window.editarProd = async (id) => {
-        const retorno = await fetch('php/produto_get.php?id=' + id);
+        const retorno = await fetch('/php/produto_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE: Excluir o produto
     window.excluirProd = async (id) => {
         if(confirm("Excluir este produto?")) {
-            const retorno = await fetch('php/produto_excluir.php?id=' + id);
+            const retorno = await fetch('/php/produto_excluir.php?id=' + id);
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {

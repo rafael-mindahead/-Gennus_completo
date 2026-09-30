@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Gennus - Editar Perfil</title>
-    <link rel="stylesheet" href="Css/dashboard.css">
+    <link rel="stylesheet" href="/assets/css/dashboard.css">
 </head>
 <body>
     <main class="dashboard-page">
         <nav class="sidebar-main">
             <div class="sidebar-logo">GENNUS</div>
             <div class="sidebar-menu">
-                <a href="dashboard.html" class="sidebar-link-root">Voltar ao Painel</a>
+                <a href="/pages/erp/dashboard.html" class="sidebar-link-root">Voltar ao Painel</a>
             </div>
         </nav>
 
@@ -34,7 +34,7 @@
                     </div>
                     <hr style="border: 0; border-top: 1px solid var(--borda); margin: 20px 0;">
                     <button type="submit">Salvar Alterações</button>
-                    <a href="dashboard.html" style="color: var(--texto-muted); text-decoration: none; margin-left: 20px; font-size: 0.9rem;">Cancelar</a>
+                    <a href="/pages/erp/dashboard.html" style="color: var(--texto-muted); text-decoration: none; margin-left: 20px; font-size: 0.9rem;">Cancelar</a>
                 </form>
             </div>
         </div>
@@ -43,7 +43,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const user = JSON.parse(localStorage.getItem("gennus_usuario_logado"));
-            if (!user) window.location.href = "login.html";
+            if (!user) window.location.href = "/pages/auth/login.html";
 
             // Preenche os campos
             document.getElementById("edit-name").value = user.nome;
@@ -65,7 +65,7 @@
                 // ... lógica de find e update ...
 
                 alert("Perfil atualizado com sucesso!");
-                window.location.href = "dashboard.html";
+                window.location.href = "/pages/erp/dashboard.html";
             });
         });
     </script>

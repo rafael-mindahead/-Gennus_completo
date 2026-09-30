@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listaHtml) return;
         listaHtml.innerHTML = "";
 
-        const retorno = await fetch('php/funcionario_get.php');
+        const retorno = await fetch('/php/funcionario_get.php');
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("vr", document.getElementById("vr").value);
         fd.append("extras", JSON.stringify(extras));
 
-        let url = 'php/funcionario_novo.php';
+        let url = '/php/funcionario_novo.php';
         if (id !== "") {
-            url = `php/funcionario_alterar.php?id=${id}`;
+            url = `/php/funcionario_alterar.php?id=${id}`;
         }
 
         const retorno = await fetch(url, { method: 'POST', body: fd });
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // GET 1 Registro para Edição
     window.editar = async (id) => {
-        const retorno = await fetch('php/funcionario_get.php?id=' + id);
+        const retorno = await fetch('/php/funcionario_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE
     window.excluir = async (id) => {
         if(confirm("Deseja realmente excluir este funcionário?")) {
-            const retorno = await fetch('php/funcionario_excluir.php?id=' + id);
+            const retorno = await fetch('/php/funcionario_excluir.php?id=' + id);
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {

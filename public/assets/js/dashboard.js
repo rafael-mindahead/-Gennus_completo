@@ -2,12 +2,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // 1. VALIDAÇÃO DE SESSÃO E CARREGAMENTO DO USUÁRIO
     try {
-        const respSessao = await fetch('php/valida_sessao.php');
+        const respSessao = await fetch('/php/valida_sessao.php');
         const jsonSessao = await respSessao.json();
 
         if (jsonSessao.status === 'nok') {
             // Se não estiver logado, chuta pro login
-            window.location.href = 'login.html';
+            window.location.href = '/pages/auth/login.html';
             return;
         }
 
@@ -23,12 +23,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // 2. LOGOFF (Sair do Sistema)
-    const btnSair = document.querySelector('.sidebar-footer a[href="login.html"]');
+    const btnSair = document.querySelector('.sidebar-footer a[href="/pages/auth/login.html"]');
     if (btnSair) {
         btnSair.addEventListener('click', async (e) => {
             e.preventDefault(); // Evita o redirecionamento padrão do link
-            await fetch('php/cliente_logoff.php');
-            window.location.href = 'login.html';
+            await fetch('/php/cliente_logoff.php');
+            window.location.href = '/pages/auth/login.html';
         });
     }
 
@@ -39,9 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const [resVendas, resFuncs, resManuais] = await Promise.all([
-            fetch('php/venda_get.php').then(r => r.json()),
-            fetch('php/funcionario_get.php').then(r => r.json()),
-            fetch('php/despesa_get.php').then(r => r.json())
+            fetch('/php/venda_get.php').then(r => r.json()),
+            fetch('/php/funcionario_get.php').then(r => r.json()),
+            fetch('/php/despesa_get.php').then(r => r.json())
         ]);
 
         if (resVendas.status === 'ok') vendas = resVendas.data;

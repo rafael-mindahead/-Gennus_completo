@@ -3,10 +3,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 1. VALIDAÇÃO DE SESSÃO
     // Impede que alguém acesse os relatórios sem estar logado
     try {
-        const respSessao = await fetch('php/valida_sessao.php');
+        const respSessao = await fetch('/php/valida_sessao.php');
         const jsonSessao = await respSessao.json();
         if (jsonSessao.status === 'nok') {
-            window.location.href = 'login.html';
+            window.location.href = '/pages/auth/login.html';
             return;
         }
     } catch (error) {
@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const [resVendas, resFuncs, resManuais, resProds] = await Promise.all([
-            fetch('php/venda_get.php').then(r => r.json()),
-            fetch('php/funcionario_get.php').then(r => r.json()),
-            fetch('php/despesa_get.php').then(r => r.json()),
-            fetch('php/produto_get.php').then(r => r.json())
+            fetch('/php/venda_get.php').then(r => r.json()),
+            fetch('/php/funcionario_get.php').then(r => r.json()),
+            fetch('/php/despesa_get.php').then(r => r.json()),
+            fetch('/php/produto_get.php').then(r => r.json())
         ]);
 
         if (resVendas.status === 'ok') vendas = resVendas.data;

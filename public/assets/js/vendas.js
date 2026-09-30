@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarProdutos() {
         if (!selectProd) return;
         
-        const retorno = await fetch('php/produto_get.php');
+        const retorno = await fetch('/php/produto_get.php');
         const resposta = await retorno.json();
 
         selectProd.innerHTML = '<option value="">Selecione um produto</option>';
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!listaVendasHtml) return;
         listaVendasHtml.innerHTML = "";
 
-        const retorno = await fetch('php/venda_get.php');
+        const retorno = await fetch('/php/venda_get.php');
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("valor_total", valorTotal);
         fd.append("custo_total", custoTotal);
 
-        const retorno = await fetch('php/venda_novo.php', { method: 'POST', body: fd });
+        const retorno = await fetch('/php/venda_novo.php', { method: 'POST', body: fd });
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {

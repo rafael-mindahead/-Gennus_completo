@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append('senha', document.getElementById('password').value);
 
         try {
-            const retorno = await fetch('php/usuario_login.php', {
+            const retorno = await fetch('/php/usuario_login.php', {
                 method: 'POST',
                 body: fd
             });
             const resposta = await retorno.json();
 
             if (resposta.status === 'ok') {
-                window.location.href = "dashboard.html";
+                window.location.href = "/pages/erp/dashboard.html";
             } else {
                 alert(resposta.mensagem);
             }

@@ -1,0 +1,18 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^produtos\.html$ /pages/erp/produtos.html [R=302,L]
+RewriteRule ^dashboard\.html$ /pages/erp/dashboard.html [R=302,L]
+RewriteRule ^funcionarios\.html$ /pages/erp/funcionarios.html [R=302,L]
+RewriteRule ^clientes\.html$ /pages/erp/clientes.html [R=302,L]
+RewriteRule ^vendas\.html$ /pages/erp/vendas.html [R=302,L]
+RewriteRule ^resumo\.html$ /pages/finance/resumo.html [R=302,L]
+RewriteRule ^renda\.html$ /pages/finance/renda.html [R=302,L]
+RewriteRule ^charts\.html$ /pages/finance/charts.html [R=302,L]
+RewriteRule ^submenu\-renda\.html$ /pages/finance/submenu-renda.html [R=302,L]
+RewriteRule ^financas\.html$ /pages/finance/financas.html [R=302,L]
+RewriteRule ^login\.html$ /pages/auth/login.html [R=302,L]
+RewriteRule ^register\.html$ /pages/auth/register.html [R=302,L]
+RewriteRule ^perfilAjustes\.html$ /pages/account/perfilAjustes.html [R=302,L]
+RewriteRule ^use\-terms\.html$ /pages/legal/use-terms.html [R=302,L]
+RewriteRule ^perfil\.html$ /pages/account/perfilAjustes.html [R=302,L]
+RewriteRule ^profile\.html$ /pages/account/perfilAjustes.html [R=302,L]

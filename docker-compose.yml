@@ -1,39 +1,48 @@
 services:
-
   web:
     build: .
     container_name: gennus_web
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - ./public:/var/www/html/public:ro
+      - ./app:/var/www/html/app:ro
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: gennus_database
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-root}
     depends_on:
-      - mysql
-
+      mysql:
+        condition: service_healthy
   mysql:
     image: mysql:8.0
     container_name: gennus_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_DATABASE: gennus_database
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - gennus_mysql_data:/var/lib/mysql
-
+      - ./database/gennus_database.sql:/docker-entrypoint-initdb.d/01-gennus.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: phpmyadmin:5
     container_name: gennus_phpmyadmin
-    restart: unless-stopped
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: root
     depends_on:
-      - mysql
-
+      mysql:
+        condition: service_healthy
 volumes:
   gennus_mysql_data:

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append('senha', document.getElementById('reg-password').value);
 
         try {
-            const retorno = await fetch('php/usuario_novo.php', {
+            const retorno = await fetch('/php/usuario_novo.php', {
                 method: 'POST',
                 body: fd
             });
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (resposta.status === 'ok') {
                 alert(resposta.mensagem);
-                window.location.href = 'login.html'; // Manda pro login
+                window.location.href = '/pages/auth/login.html'; // Manda pro login
             } else {
                 alert("Erro: " + resposta.mensagem);
             }

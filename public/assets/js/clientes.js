@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // READ: Busca clientes do banco e renderiza
     async function renderizarClientes() {
-        const retorno = await fetch('php/cliente_get.php');
+        const retorno = await fetch('/php/cliente_get.php');
         const resposta = await retorno.json();
 
         listaHtml.innerHTML = "";
@@ -40,11 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("telefone", document.getElementById("telefone").value);
         fd.append("documento", document.getElementById("documento").value);
 
-        let url = 'php/cliente_novo.php'; // Padrão: criar novo
+        let url = '/php/cliente_novo.php'; // Padrão: criar novo
         
         // Se tem ID, muda a URL para a de alteração (passando ID na URL)
         if (id !== "") {
-            url = `php/cliente_alterar.php?id=${id}`;
+            url = `/php/cliente_alterar.php?id=${id}`;
         }
 
         const retorno = await fetch(url, { method: 'POST', body: fd });
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Função global para carregar dados para edição (GET 1 registro)
     window.editarCliente = async (id) => {
-        const retorno = await fetch('php/cliente_get.php?id=' + id);
+        const retorno = await fetch('/php/cliente_get.php?id=' + id);
         const resposta = await retorno.json();
 
         if (resposta.status === 'ok') {
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // DELETE: Excluir cliente
     window.excluirCliente = async (id) => {
         if (confirm("Deseja realmente excluir este cliente?")) {
-            const retorno = await fetch('php/cliente_excluir.php?id=' + id);
+            const retorno = await fetch('/php/cliente_excluir.php?id=' + id);
             const resposta = await retorno.json();
             
             if(resposta.status === 'ok') {
