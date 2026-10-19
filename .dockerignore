@@ -3,3 +3,9 @@
 mobile
 docs
 tests
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/vendor
+backend/storage/logs
+backend/.phpunit.cache
