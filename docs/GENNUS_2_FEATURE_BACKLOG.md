@@ -99,3 +99,32 @@ O vínculo de cliente não existe ainda e deve ser criado antes de prometer indi
 - Respostas com indicadores rastreáveis e definições claras (receita ≠ lucro líquido).
 - Segregação de dados financeiros e de RH por política, logs sem segredos, LGPD/retencão alinhados com uso real.
 - Suíte automatizada para CRUD, autorização, consultas agregadas, transações e contratos SwiftUI.
+
+
+## G2-PBI-019 — Comprovante de venda demonstrativo (SEM VALOR FISCAL)
+**Objetivo:** após registrar uma venda/pedido, permitir visualizar, imprimir, baixar em PDF e reimprimir um comprovante comercial **simulado** para demonstração acadêmica, sem qualquer valor fiscal.
+
+**Campos exibidos:** marca e dados de empresa fictícia/identificada como demonstração; número sequencial **interno** `DEMO-000001`, data/hora local, cliente opcional, vendedor opcional, descrição de itens, quantidade, preço unitário, subtotal, descontos, total, forma de pagamento (informativa) e status de cancelamento. O número interno nunca será denominado série/numero de nota fiscal.
+
+**Avisos obrigatórios:** exibir em fonte legível e em destaque no topo e no rodapé `DOCUMENTO DEMONSTRATIVO — SEM VALOR FISCAL` e `NÃO É NF-e, NFC-e OU NFS-e`. Nunca incluir logo da SEFAZ, chave de acesso de 44 dígitos, QR Code de consulta fiscal, XML fiscal ou layout que se passe por autorização tributária. Não atribuir CNPJ real sem permissão; dados de demonstração devem ser claramente fictícios.
+
+**Arquitetura proposta:** `GerarComprovanteDemo.php` (Action) e `ComprovanteDemoService.php` compõem renderização HTML para impressão/PDF a partir de venda/pedido persistido e autorizado. Usar os valores históricos de cada item, arredondamento decimal estável, tributos não calculados/sem discriminação inventada, e informações de pagamento apenas se registradas. Não inferir que pagamento foi efetivado. `GET /api/v1/vendas/{id}/comprovante-demo` ou `GET /api/v1/pedidos/{id}/comprovante-demo` com acesso autenticado; ações de download e impressão no frontend.
+
+**Critérios de aceite:**
+- Comprovante tem marcações explícitas de simulação e não contém elementos de documento fiscal oficial.
+- Valores fecham com venda/pedido, múltiplos itens e desconto registrado, sem modificar estoque nem banco durante a impressão.
+- Reimpressão repete valores históricos e exibe status atual (inclusive cancelamento).
+- Cliente ausente e vendas legadas têm apresentação adequada; nenhum dado de pessoa de outra conta é exposto.
+- Testes para autorização, PDF/HTML, formatação, números, desconto, devolução/cancelamento, UTF-8 e regressão iOS.
+
+**Dependências:** G2-PBI-001, G2-PBI-008 e, para múltiplos itens, G2-PBI-012. Recurso agendado na **Sprint 2**, com refinamentos de exportação na Sprint 5.
+
+## Organização no Trello — cinco sprints
+Quadro privado: https://trello.com/b/emek5h2a/gennus-20-sprints-e-backlog
+- Sprint 1: base Laravel + Docker + CI inicial + Produto 360° — G2-001 a G2-007.
+- Sprint 2: Cliente 360°, relação vendas, pedidos e comprovante demonstrativo — G2-008 a G2-015.
+- Sprint 3: RH, escalas, registros de presença e relatório — G2-016 a G2-021.
+- Sprint 4: GennIA, análises, segurança e custo — G2-022 a G2-027.
+- Sprint 5: fornecedores, estoque, financeiro, CRM, relatórios, Azure e entrega — G2-028 a G2-035.
+
+Os 35 cards representam o plano de trabalho, não funcionalidades já entregues. Prazos e responsáveis ainda não foram definidos.
