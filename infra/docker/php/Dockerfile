@@ -1,7 +1,7 @@
 FROM php:8.3-fpm-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git unzip libzip-dev libicu-dev libonig-dev libxml2-dev \
+        git unzip libzip-dev libicu-dev libonig-dev libxml2-dev libsqlite3-dev \
     && docker-php-ext-install pdo_mysql pdo_sqlite zip intl mbstring \
     && rm -rf /var/lib/apt/lists/*
 
