@@ -2,6 +2,9 @@
 
 > Documento de arquitetura. A implementação ainda não foi executada. O legado permanece intacto na branch `main`.
 
+## Backlog funcional
+Consulte [GENNUS_2_FEATURE_BACKLOG.md](GENNUS_2_FEATURE_BACKLOG.md) para os módulos Cliente 360°, Produto 360°, presença de funcionários, GennIA, dependências de dados, critérios de aceite e priorização P0–P3.
+
 ## Objetivo e escopo
 Migrar o ERP atual (HTML/CSS/JS, PHP procedural, MySQL, Docker, SwiftUI) incrementalmente para um **monólito modular Laravel** implantável na Azure, com CI/CD no GitHub Actions e análise de dados via OpenAI API. Preservar funcionalidades, dados, compatibilidade do iOS e **uma classe Action por operação CRUD**.
 
