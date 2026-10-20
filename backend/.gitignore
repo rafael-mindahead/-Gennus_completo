@@ -1,7 +1,0 @@
-/.env
-/.env.testing
-/vendor/
-/.phpunit.cache
-/public/storage
-/storage/*.key
-/storage/logs/*.log
