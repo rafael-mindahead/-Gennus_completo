@@ -23,4 +23,18 @@ Route::middleware('auth')->group(function () {
         '/php/produto_get.php',
         [ProdutoController::class, 'index']
     );
+    Route::post(
+        '/php/produto_novo.php',
+        [ProdutoController::class, 'store']
+    );
+
+    Route::post(
+        '/php/produto_alterar.php',
+        [ProdutoController::class, 'update']
+    );
+
+    Route::post(
+        '/php/produto_excluir.php',
+        [ProdutoController::class, 'destroy']
+    );
 });
