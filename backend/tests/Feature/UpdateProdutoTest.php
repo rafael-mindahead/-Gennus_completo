@@ -33,7 +33,7 @@ class UpdateProdutoTest extends TestCase
             'unidade' => 'un',
             'custo' => '45.10',
             'preco' => '89.90',
-            'estoque' => '12.500'
+            'estoque' => '10.000'
         ];
     }
 
@@ -84,6 +84,58 @@ class UpdateProdutoTest extends TestCase
         (new UpdateProduto())->execute(
             999999,
             $this->dadosAtualizados()
+        );
+    }
+    public function test_impede_alteracao_direta_de_estoque(): void
+    {
+        $produto = $this->criarProduto();
+
+        $dados = $this->dadosAtualizados();
+        $dados['estoque'] = '15.000';
+
+        try {
+            (new UpdateProduto())->execute(
+                $produto->id,
+                $dados
+            );
+
+            $this->fail(
+                'A atualização direta do estoque deveria falhar.'
+            );
+
+        } catch (ValidationException $e) {
+
+            $this->assertArrayHasKey(
+                'estoque',
+                $e->errors()
+            );
+
+            $this->assertSame(
+                '10.000',
+                $produto->fresh()->estoque
+            );
+        }
+    }
+    public function test_atualiza_codigo_de_barras(): void
+    {
+        $produto = $this->criarProduto();
+
+        $dados = $this->dadosAtualizados();
+        $dados['codigo_barras'] = '7900000000001';
+
+        $resultado = (new UpdateProduto())->execute(
+            $produto->id,
+            $dados
+        );
+
+        $this->assertSame(
+            '7900000000001',
+            $resultado->codigo_barras
+        );
+
+        $this->assertSame(
+            '10.000',
+            $resultado->estoque
         );
     }
 }
