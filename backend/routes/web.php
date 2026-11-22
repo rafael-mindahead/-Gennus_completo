@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProdutoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,3 +17,10 @@ Route::post('/php/usuario_login.php', [AuthController::class, 'login'])->middlew
 Route::get('/php/valida_sessao.php', [AuthController::class, 'session']);
 
 Route::post('/php/cliente_logoff.php', [AuthController::class, 'logout']);
+
+Route::middleware('auth')->group(function () {
+    Route::get(
+        '/php/produto_get.php',
+        [ProdutoController::class, 'index']
+    );
+});
