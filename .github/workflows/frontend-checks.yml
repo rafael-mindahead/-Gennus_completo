@@ -1,0 +1,26 @@
+name: Frontend static checks
+
+on:
+  push:
+    branches: [develop/gennus-2]
+    paths:
+      - 'frontend/**'
+      - 'tests/frontend/**'
+      - 'infra/docker/nginx/default.conf'
+      - '.github/workflows/frontend-checks.yml'
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check local CSS and JS links
+        run: python3 -m unittest discover -s tests/frontend -p 'test_*.py' -v
+      - name: Check JavaScript syntax
+        run: find frontend/assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Test logout and session behavior
+        run: node --test tests/frontend/session.test.cjs

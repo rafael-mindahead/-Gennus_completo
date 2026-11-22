@@ -1,0 +1,63 @@
+
+name: gennus2
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: infra/docker/php/Dockerfile
+
+    working_dir: /var/www/backend
+
+    volumes:
+      - ./backend:/var/www/backend
+
+    env_file:
+      - ./backend/.env
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.28-alpine
+
+    ports:
+      - "127.0.0.1:8082:80"
+
+    volumes:
+      - ./frontend:/var/www/frontend:ro
+      - ./infra/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    depends_on:
+      - app
+
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+
+    environment:
+      MYSQL_DATABASE: gennus_v2
+      MYSQL_USER: gennus
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Configure DB_ROOT_PASSWORD}
+
+    volumes:
+      - gennus_v2_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h 127.0.0.1 -u root --password="$$MYSQL_ROOT_PASSWORD" --silent
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+    restart: unless-stopped
+
+volumes:
+  gennus_v2_data:

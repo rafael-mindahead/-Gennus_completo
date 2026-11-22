@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+#[Fillable([
+    'nome',
+    'categoria',
+    'unidade',
+    'custo',
+    'preco',
+    'estoque',
+    'codigo_barras'
+])]
+
+class Produto extends Model
+{
+    protected $table = 'produtos';
+
+    protected function casts(): array
+    {
+        return [
+            'custo' => 'decimal:2',
+            'preco' => 'decimal:2',
+            'estoque' => 'decimal:3'
+        ];
+    }
+    use SoftDeletes;
+}
