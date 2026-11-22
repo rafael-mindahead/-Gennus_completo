@@ -12,7 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'unidade',
     'custo',
     'preco',
-    'estoque'
+    'estoque',
+    'codigo_barras'
 ])]
 
 class Produto extends Model
