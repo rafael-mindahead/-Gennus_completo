@@ -1,4 +1,4 @@
-git stash pop<?php
+<?php
 
 namespace Tests\Feature;
 
@@ -6,6 +6,7 @@ use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+
 
 class ProdutoModelTest extends TestCase
 {

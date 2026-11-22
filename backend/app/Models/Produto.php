@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'nome',
@@ -26,4 +27,5 @@ class Produto extends Model
             'estoque' => 'decimal:3'
         ];
     }
+    use SoftDeletes;
 }
