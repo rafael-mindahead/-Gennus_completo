@@ -118,4 +118,48 @@ class RegistrarMovimentacaoTest extends TestCase
 
         $action->execute($evento);
     }
+
+    public function test_rejeita_uuid_entre_produtos_diferentes(): void
+    {
+        $primeiro = $this->criarProduto();
+
+        $segundo = Produto::create([
+            'nome' => 'Segundo produto',
+            'codigo_barras' => '7891234567890',
+            'categoria' => 'Eletronicos',
+            'unidade' => 'un',
+            'custo' => '15.00',
+            'preco' => '30.00',
+            'estoque' => '20.000'
+        ]);
+
+        $action = new RegistrarMovimentacao();
+
+        $action->execute($this->evento());
+
+        $eventoRepetido = $this->evento();
+        $eventoRepetido['codigo_barras'] = '7891234567890';
+
+        try {
+            $action->execute($eventoRepetido);
+
+            $this->fail('O UUID duplicado deveria ser rejeitado.');
+
+        } catch (\DomainException $e) {
+            $this->assertSame(
+                '15.000',
+                $primeiro->fresh()->estoque
+            );
+
+            $this->assertSame(
+                '20.000',
+                $segundo->fresh()->estoque
+            );
+
+            $this->assertDatabaseCount(
+                'movimentacoes_estoque',
+                1
+            );
+        }
+    }
 }
