@@ -1,0 +1,71 @@
+
+name: Gennus Backend Checks
+
+on:
+  push:
+    branches:
+      - main
+      - develop/gennus-2
+
+  pull_request:
+    branches:
+      - main
+      - develop/gennus-2
+
+  workflow_dispatch:
+
+jobs:
+  laravel-tests:
+    name: Laravel 13 - PHP 8.4
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      DB_URL: ""
+
+      SESSION_DRIVER: array
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, intl, zip, dom
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Configure application
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+
+      - name: Validate PHP syntax
+        run: |
+          find app routes database/migrations tests \
+            -type f -name '*.php' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Validate migrations
+        run: |
+          touch database/ci.sqlite
+          DB_DATABASE="$GITHUB_WORKSPACE/backend/database/ci.sqlite" \
+            php artisan migrate --force
+
+      - name: Run Laravel tests
+        run: php artisan test
