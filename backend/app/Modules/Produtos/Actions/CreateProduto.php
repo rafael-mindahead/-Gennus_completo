@@ -42,6 +42,12 @@ final class CreateProduto
                 'numeric',
                 'min:0',
                 'regex:/^\d{1,9}(\.\d{1,3})?$/'
+            ],
+            'codigo_barras' => [
+                'nullable',
+                'string',
+                'regex:/^(\d{8}|\d{12,14})$/',
+                Rule::unique('produtos', 'codigo_barras')
             ]
         ])->validate();
         return Produto::create($validado);

@@ -172,4 +172,50 @@ class EstoqueInternoHttpTest extends TestCase
             $this->headers()
         )->assertNotFound();
     }
+
+    public function test_retorna_erro_correto_para_estoque_insuficiente(): void
+    {
+        $evento = $this->evento();
+        $evento['quantidade_delta'] = -11;
+
+        $resposta = $this->postJson(
+            self::URL,
+            $evento,
+            $this->headers()
+        );
+
+        $resposta
+            ->assertUnprocessable()
+            ->assertJsonPath('status', 'error')
+            ->assertJsonStructure([
+                'errors' => ['estoque']
+            ]);
+
+        $this->assertDatabaseHas('produtos', [
+            'codigo_barras' => '7900000000001',
+            'estoque' => '10.000'
+        ]);
+
+        $this->assertDatabaseCount(
+            'movimentacoes_estoque',
+            0
+        );
+    }
+
+    public function test_retorna_erro_correto_para_codigo_barras_invalido(): void
+    {
+        $evento = $this->evento();
+        $evento['codigo_barras'] = 'ABC123';
+
+        $this->postJson(
+            self::URL,
+            $evento,
+            $this->headers()
+        )
+            ->assertUnprocessable()
+            ->assertJsonPath('status', 'error')
+            ->assertJsonStructure([
+                'errors' => ['codigo_barras']
+            ]);
+    }
 }

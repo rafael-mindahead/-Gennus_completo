@@ -128,4 +128,26 @@ class ProdutoWriteHttpTest extends TestCase
             $this->dados()
         )->assertNotFound();
     }
+    public function test_cadastra_produto_com_codigo_barras_http(): void
+    {
+        $this->autenticar();
+
+        $dados = $this->dados();
+        $dados['codigo_barras'] = '07891234567890';
+
+        $this->postJson(
+            '/php/produto_novo.php',
+            $dados
+        )
+            ->assertCreated()
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath(
+                'data.codigo_barras',
+                '07891234567890'
+            );
+
+        $this->assertDatabaseHas('produtos', [
+            'codigo_barras' => '07891234567890'
+        ]);
+    }
 }

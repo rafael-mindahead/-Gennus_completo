@@ -82,4 +82,70 @@ class CreateProdutoTest extends TestCase
             $produto->fresh()->estoque
         );
     }
+
+public function test_cadastra_produto_com_codigo_barras(): void
+{
+    $dados = $this->dadosValidos();
+
+    $dados['codigo_barras'] = '07891234567890';
+
+    $produto = (new CreateProduto())->execute($dados);
+
+    $this->assertSame(
+        '07891234567890',
+        $produto->fresh()->codigo_barras
+    );
+
+    $this->assertDatabaseHas('produtos', [
+        'id' => $produto->id,
+        'codigo_barras' => '07891234567890'
+    ]);
+}
+
+public function test_rejeita_codigo_barras_invalido(): void
+{
+    $dados = $this->dadosValidos();
+    $dados['codigo_barras'] = 'ABC123';
+
+    try {
+        (new CreateProduto())->execute($dados);
+
+        $this->fail(
+            'Deveria rejeitar o código de barras inválido.'
+        );
+
+    } catch (ValidationException $e) {
+        $this->assertArrayHasKey(
+            'codigo_barras',
+            $e->errors()
+        );
+
+        $this->assertDatabaseCount('produtos', 0);
+    }
+}
+    public function test_rejeita_codigo_barras_duplicado(): void
+    {
+        $dados = $this->dadosValidos();
+        $dados['codigo_barras'] = '7900000000001';
+
+        $action = new CreateProduto();
+
+        $action->execute($dados);
+
+        try {
+            $action->execute($dados);
+
+            $this->fail(
+                'Deveria rejeitar o código de barras duplicado.'
+            );
+
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey(
+                'codigo_barras',
+                $e->errors()
+            );
+
+            $this->assertDatabaseCount('produtos', 1);
+        }
+    }
 }

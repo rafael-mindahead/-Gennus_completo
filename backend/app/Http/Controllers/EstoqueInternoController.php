@@ -24,7 +24,7 @@ final class EstoqueInternoController extends Controller
                 ]
             ], $novo ? 201 : 200);
         } catch (ValidationException $e){
-            return $this->erro(['produto' => ['produto nao encontrado']], 422);
+            return $this->erro($e->errors(), 422);
         } catch (ModelNotFoundException $e){
             return $this->erro(['produto' => ['produto nao encontrado']], 404);
         } catch (DomainException $e){
