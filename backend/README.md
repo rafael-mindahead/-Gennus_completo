@@ -1,58 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gennus 2.0 — Backend Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este diretório contém o **núcleo transacional** do [Gennus 2.0](../README.md), construído em PHP 8.4 / Laravel 13, com MySQL 8.4 em Docker. O frontend legado é servido pelo Nginx a partir de `../frontend`.
 
-## About Laravel
+> Esta é a documentação do backend do Gennus, não o template genérico do framework. Veja o [README principal](../README.md) para arquitetura, instalação e roadmap.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Organização
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+~~~text
+app/
+├── Http/Controllers/          # Adaptadores de entrada HTTP
+├── Http/Middleware/           # Autenticação de serviços
+├── Models/                    # Eloquent
+└── Modules/
+    ├── Auth/                  # Registro/login/logout
+    ├── Produtos/Actions/      # Create, Get, Update, Delete
+    └── Estoque/Actions/       # RegistrarMovimentacao
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+routes/
+├── web.php                    # Sessão, CSRF, rotas legadas /php/
+└── api.php                    # API stateless interna
 
-## Learning Laravel
+tests/
+├── Feature/                   # Testes Laravel automatizados
+└── Manual/                    # Scripts de concorrência MySQL
+~~~
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Iniciar pelo Docker Compose
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Os comandos abaixo devem ser executados **na raiz do repositório**.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Copie `backend/.env.example` para `backend/.env`, configure MySQL e as variáveis `DB_PASSWORD` / `DB_ROOT_PASSWORD`. Depois:
 
-## Agentic Development
+~~~bash
+docker compose --env-file backend/.env up -d --build
+docker compose --env-file backend/.env exec app composer install
+docker compose --env-file backend/.env exec app php artisan key:generate
+docker compose --env-file backend/.env up -d --force-recreate app
+docker compose --env-file backend/.env exec app php artisan migrate
+~~~
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+O sistema local é acessível em **http://localhost:8082**. Use `docker compose --env-file backend/.env ps` para consultar os serviços.
 
-```bash
-composer require laravel/boost --dev
+## Testes automatizados
 
-php artisan boost:install
-```
+~~~bash
+docker compose --env-file backend/.env exec \
+  -e APP_ENV=testing \
+  -e DB_CONNECTION=sqlite \
+  -e DB_DATABASE=:memory: \
+  -e DB_URL= \
+  -e SESSION_DRIVER=array \
+  -e CACHE_STORE=array \
+  -e QUEUE_CONNECTION=sync \
+  app php artisan test
+~~~
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+O CI do backend reside em [`.github/workflows/backend-checks.yml`](../.github/workflows/backend-checks.yml) e executa validações estáticas de sintaxe, migrations e suíte de testes. Scripts em `tests/Manual/` são para um banco de teste separado, nunca para o banco principal.
 
-## Contributing
+## Contrato interno do estoque
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+~~~http
+POST /api/internal/v1/estoque/movimentacoes
+Content-Type: application/json
+X-Gennus-Service-Token: <segredo de serviço>
+~~~
 
-## Code of Conduct
+~~~json
+{
+  "evento_id": "550e8400-e29b-41d4-a716-446655440000",
+  "dispositivo_id": 1,
+  "codigo_barras": "7900000000001",
+  "quantidade_delta": 5
+}
+~~~
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+O Laravel é a autoridade sobre o estoque oficial; o Go worker e a ligação com o GenZIoT ainda estão em desenvolvimento. Não exponha tokens em arquivos versionados nem no frontend.
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Consulte o [README da raiz](../README.md) para detalhes de status, rotas, segurança e prioridades.
