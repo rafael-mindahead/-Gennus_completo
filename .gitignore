@@ -1,0 +1,13 @@
+# macOS / Finder
+.DS_Store
+**/.DS_Store
+._*
+.AppleDouble/
+.LSOverride
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
+
+# Local editor files
+.vscode/
+.idea/
