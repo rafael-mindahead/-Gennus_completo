@@ -1,6 +1,6 @@
 # Gennus 2.0 — Backend Laravel
 
-Este diretório contém o **núcleo transacional** do [Gennus 2.0](../README.md), construído em PHP 8.4 / Laravel 13, com MySQL 8.4 em Docker. O frontend legado é servido pelo Nginx a partir de `../frontend`.
+Este diretório contém o **núcleo transacional** do [Gennus 2.0](../README.md), construído em PHP 8.4 / Laravel 13, com MySQL 8.4 em Docker. O frontend legado foi retirado de `develop/gennus-2`. O Nginx continua instalado com as rotas `/api/*`, `/php/*` e `/up` para teste do backend e futura integração React; `../frontend/` está reservada para a nova interface.
 
 > Esta é a documentação do backend do Gennus, não o template genérico do framework. Veja o [README principal](../README.md) para arquitetura, instalação e roadmap.
 
@@ -39,7 +39,7 @@ docker compose --env-file backend/.env up -d --force-recreate app
 docker compose --env-file backend/.env exec app php artisan migrate
 ~~~
 
-O sistema local é acessível em **http://localhost:8082**. Use `docker compose --env-file backend/.env ps` para consultar os serviços.
+Teste o Laravel em **http://localhost:8082/up**. No estado sem interface, `/` responde 404; `/api/*` e `/php/*` continuam encaminhadas pelo Nginx. Use `docker compose --env-file backend/.env ps` para consultar os serviços.
 
 ## Testes automatizados
 

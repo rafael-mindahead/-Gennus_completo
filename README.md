@@ -3,9 +3,8 @@
 **ERP em reconstrução, com foco em engenharia de software, integridade de estoque, testes e evolução para um ecossistema distribuído.**
 
 [![Backend checks](https://github.com/rafael-mindahead/-Gennus_completo/actions/workflows/backend-checks.yml/badge.svg?branch=develop%2Fgennus-2)](https://github.com/rafael-mindahead/-Gennus_completo/actions/workflows/backend-checks.yml)
-[![Frontend checks](https://github.com/rafael-mindahead/-Gennus_completo/actions/workflows/frontend-checks.yml/badge.svg?branch=develop%2Fgennus-2)](https://github.com/rafael-mindahead/-Gennus_completo/actions/workflows/frontend-checks.yml)
 
-> **Status:** em desenvolvimento. O CRUD de produtos, a autenticação e o motor inicial de movimentações estão implementados. As páginas legadas de vendas/financeiro não representam, por si, módulos backend concluídos. Go, React e Python/ML são evoluções planejadas, não serviços em produção.
+> **Status:** backend em desenvolvimento. A interface HTML/CSS/JS antiga foi retirada da branch `develop/gennus-2` para abrir espaço à futura implementação em React + TypeScript. CRUD de produtos, autenticação e o motor inicial de estoque estão implementados no Laravel; Go, React e Python/ML continuam planejados, sem serviços em produção.
 
 ## Objetivo
 
@@ -18,21 +17,20 @@ O Gennus 2.0 refatora um ERP originalmente desenvolvido em PHP para uma base Lar
 | Backend | PHP 8.4, Laravel 13, Eloquent, Actions |
 | Banco principal | MySQL 8.4 (InnoDB) |
 | Desenvolvimento/testes | SQLite em memória nos testes PHPUnit; MySQL em testes manuais de concorrência |
-| Web | HTML, CSS e JavaScript (frontend legado) |
+| Interface | React + TypeScript (planejado; sem frontend operacional nesta branch) |
 | Infraestrutura local | Docker Compose, Nginx, PHP-FPM |
-| Qualidade | PHPUnit/Feature, testes de frontend, GitHub Actions |
+| Qualidade | PHPUnit/Feature e GitHub Actions do backend |
 
 ## Arquitetura
 
 ~~~mermaid
 flowchart TD
-    U["Navegador: HTML / CSS / JS"] --> N["Nginx"]
+    R["React + TypeScript (planejado)"] -. "UI futura" .-> N["Nginx: rotas HTTP preservadas"]
     N --> L["Laravel: autenticação, Actions e contratos HTTP"]
     L --> DB[("MySQL: estoque oficial e movimentações")]
 
     I["GenZIoT: ESP32 + Rust (projeto separado)"] -. "integração futura" .-> G["Go worker (planejado)"]
     G -. "API interna já criada" .-> L
-    R["React + TypeScript (planejado)"] -.-> N
     P["Python: dados e ML (planejado)"] -. "integração futura" .-> L
 ~~~
 
@@ -47,7 +45,7 @@ flowchart TD
 
 ~~~text
 .
-├── .github/workflows/          # CI de backend e frontend
+├── .github/workflows/          # CI do backend
 ├── backend/
 │   ├── app/
 │   │   ├── Http/               # Controllers e middleware
@@ -56,9 +54,8 @@ flowchart TD
 │   ├── database/migrations/
 │   ├── routes/                 # web.php e api.php
 │   └── tests/                  # Feature e testes manuais MySQL
-├── frontend/                   # Interface atual, páginas e assets
+├── frontend/                   # Pasta reservada para o React; contém apenas README
 ├── infra/docker/               # PHP-FPM e Nginx
-├── tests/frontend/             # Verificações estáticas/JS
 ├── docs/
 └── compose.yaml
 ~~~
@@ -102,7 +99,7 @@ docker compose --env-file backend/.env exec app php artisan migrate
 docker compose --env-file backend/.env ps
 ~~~
 
-5. Acesse **http://localhost:8082**. O Nginx serve o frontend atual e encaminha `/php/*` e `/api/*` para o Laravel.
+5. Para verificar o backend, acesse **http://localhost:8082/up** (health check). O Nginx continua encaminhando `/php/*` e `/api/*` ao Laravel. **A rota `/` não tem interface nesta fase e deve retornar 404**, até a chegada do React.
 
 Para desligar os serviços sem excluir dados:
 
@@ -114,7 +111,7 @@ docker compose --env-file backend/.env down
 
 ## Funcionalidades implementadas
 
-- Registro, login, sessão e logout de usuários com autenticação Laravel e CSRF na interface de mesma origem.
+- Registro, login, sessão e logout com autenticação Laravel e CSRF nas rotas web; no momento, sem interface HTML. A nova SPA precisará ser integrada/testada posteriormente.
 - Produtos: Actions independentes de criação, consulta, edição e arquivamento lógico (Soft Delete), com validações e código de barras no backend.
 - Estoque: registro de movimentação via transação, `lockForUpdate()`, evento UUID único e rejeição de saldo negativo.
 - API interna inicial para recebimento de eventos do GenZIoT por token de serviço, **ainda sem worker Go conectado**.
@@ -164,21 +161,25 @@ docker compose --env-file backend/.env exec \
   app php artisan test
 ~~~
 
-Os workflows em `.github/workflows/` executam verificações de backend e frontend. Os scripts de concorrência em `backend/tests/Manual/` exigem **MySQL de testes isolado** (por exemplo, `gennus_v2_test`); ainda não são um gate de CI.
+O workflow `.github/workflows/backend-checks.yml` executa verificações do Laravel. O workflow e os testes exclusivos do frontend antigo foram retirados. Os scripts de concorrência em `backend/tests/Manual/` exigem **MySQL de testes isolado** (por exemplo, `gennus_v2_test`); ainda não são um gate de CI.
+
+## Design da próxima interface
+
+A identidade visual roxo/preto do Gennus, com decisões sobre tipografia, sidebar, cards e gráficos, está documentada em [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md). Os arquivos HTML/CSS/JS anteriores permanecem recuperáveis no [commit anterior à limpeza](https://github.com/rafael-mindahead/-Gennus_completo/tree/3e90488311aa05a22e27c901e64f433c2964d2db/frontend); não são necessários para executar o backend.
 
 ## Próximas prioridades
 
-1. Concluir compatibilidade do campo `codigo_barras` na interface HTML/JS e fortalecer testes de contrato e autorização.
-2. Reforçar a autenticação entre serviços, RBAC, documentação de API e consistência entre operações de vendas e estoque.
-3. Automatizar os cenários concorrentes com MySQL/InnoDB e adicionar métricas de p95/p99.
-4. Integrar o GenZIoT por um **worker Go** com limites de concorrência, backpressure, retentativas e rastreabilidade.
-5. Migrar o frontend gradualmente para React + TypeScript; implementar serviços Python de análises/ML quando houver dados e casos de uso validados.
+1. Reforçar autenticação, autorização RBAC, CSRF/sessões e contratos HTTP do Laravel para clientes futuros.
+2. Automatizar os testes concorrentes em MySQL/InnoDB em uma base isolada.
+3. Integrar GenZIoT por **worker Go**, com limites de concorrência, backpressure, retentativas e rastreabilidade.
+4. Desenvolver uma interface nova em React + TypeScript a partir do design registrado, sem reaproveitar os módulos HTML/JS antigos.
+5. Implementar análises e Python/ML somente quando houver dados e casos de uso validados.
 
 ## Desenvolvimento
 
 - Branch de trabalho: `develop/gennus-2`; `main` é atualizada após validação e merge.
 - Preferir mudanças pequenas, testes antes de merge e commits descritivos.
-- A interface de vendas/financeiro herdada do ERP original **não deve ser tomada como prova** de APIs transacionais completas.
+- A interface legada foi descontinuada nesta branch; as telas históricas de vendas/financeiro **não comprovam** a existência de APIs transacionais completas.
 - Para bugs ou melhorias, utilize as issues e o histórico de Pull Requests do repositório.
 
 **Status:** projeto em evolução; não é uma distribuição pronta para produção.
