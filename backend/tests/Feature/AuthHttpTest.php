@@ -21,6 +21,19 @@ class AuthHttpTest extends TestCase
 
     public function test_cadastro_http(): void
     {
+
+        $administrador = User::create([
+            'name' => 'Administrador Teste',
+            'email' => 'admin@gennus.test',
+            'password' => 'SenhaSegura123',
+        ]);
+
+        $administrador->forceFill([
+            'perfil' => 'administrador',
+        ])->save();
+
+        $this->actingAs($administrador->fresh());
+
         $this->post('/php/usuario_novo.php', [
             'nome' => 'Ana',
             'sobrenome' => 'Silva',

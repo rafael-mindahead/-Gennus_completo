@@ -21,5 +21,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('produtos.gravar', fn(User $user): bool => in_array($user->perfil,['operador', 'administrador'], true));
         Gate::define('produtos.excluir', fn(User $user): bool => in_array($user->perfil, ['operador','administrador'],true));
         Gate::define('produtos.restaurar', fn(User $user): bool => $user->perfil === 'administrador');
+        Gate::define('usuarios.criar', fn(User $user): bool => $user->perfil === 'administrador');
     }
 }

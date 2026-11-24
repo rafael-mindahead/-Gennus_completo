@@ -17,6 +17,7 @@ Route::post('/php/usuario_login.php', [AuthController::class, 'login'])->middlew
 Route::get('/php/valida_sessao.php', [AuthController::class, 'session']);
 
 Route::post('/php/cliente_logoff.php', [AuthController::class, 'logout']);
+Route::post('/php/usuario_novo.php',[AuthController::class, 'register'])->middleware('throttle:5,1');
 
 Route::middleware('auth')->group(function () {
     Route::get(
@@ -41,4 +42,8 @@ Route::middleware('auth')->group(function () {
         '/php/produto_restaurar.php',
         [ProdutoController::class, 'restore']
     )->middleware('can:produtos.restaurar');
+    Route::post(
+        '/php/usuario_novo.php',
+        [AuthController::class, 'register']
+    )->middleware(['can:usuarios.criar', 'throttle:5,1']);
 });

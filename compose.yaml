@@ -59,5 +59,64 @@ services:
 
     restart: unless-stopped
 
+  
+  db_test:
+    profiles: ["testing"]
+    image: mysql:8.4
+
+    environment:
+      MYSQL_DATABASE: gennus_test
+      MYSQL_USER: gennus_test
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Configure DB_ROOT_PASSWORD}
+
+    volumes:
+      - gennus_test_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h 127.0.0.1 -u root --password="$$MYSQL_ROOT_PASSWORD" --silent
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+    restart: "no"
+  
+  scheduler_test:
+    profiles: ["testing"]
+
+    build:
+      context: .
+      dockerfile: infra/docker/php/Dockerfile
+
+    working_dir: /var/www/backend
+
+    volumes:
+      - ./backend:/var/www/backend
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: db_test
+      DB_PORT: "3306"
+      DB_DATABASE: gennus_test
+      DB_USERNAME: gennus_test
+      DB_URL: ""
+      CACHE_STORE: database
+
+    depends_on:
+      db_test:
+        condition: service_healthy
+
+    command: ["php", "artisan", "schedule:work"]
+
+    restart: unless-stopped
+
 volumes:
   gennus_v2_data:
+  gennus_test_data:
