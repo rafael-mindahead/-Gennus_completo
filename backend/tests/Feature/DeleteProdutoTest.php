@@ -29,7 +29,7 @@ class DeleteProdutoTest extends TestCase
     {
         $produto = $this->criarProduto();
 
-        (new DeleteProduto())->execute($produto->id, $this->$operador);
+        (new DeleteProduto())->execute($produto->id, $this->operador);
 
         $this->assertSoftDeleted('produtos', [
             'id' => $produto->id
@@ -44,7 +44,7 @@ class DeleteProdutoTest extends TestCase
     {
         $produto = $this->criarProduto();
 
-        (new DeleteProduto())->execute($produto->id, $this->$operador);
+        (new DeleteProduto())->execute($produto->id, $this->operador);
 
         $arquivado = Produto::withTrashed()
             ->find($produto->id);
@@ -59,7 +59,7 @@ class DeleteProdutoTest extends TestCase
         $primeiro = $this->criarProduto('Mouse');
         $segundo = $this->criarProduto('Teclado');
 
-        (new DeleteProduto())->execute($primeiro->id, $this->$operador);
+        (new DeleteProduto())->execute($primeiro->id, $this->operador);
 
         $this->assertNotNull(
             Produto::find($segundo->id)
@@ -76,7 +76,7 @@ class DeleteProdutoTest extends TestCase
             ModelNotFoundException::class
         );
 
-        (new DeleteProduto())->execute(999999);
+        (new DeleteProduto())->execute(999999, $this->operador);
     }
     private User $operador;
 

@@ -13,14 +13,22 @@ class ProdutoHttpTest extends TestCase
     private function autenticar(): void
     {
         $usuario = User::create([
-            'name' => 'Administrador Teste',
-            'email' => 'admin@gennus.test',
+            'name' => 'Leitor Teste',
+            'email' => 'leitor@gennus.test',
             'password' => 'SenhaSegura123'
         ]);
 
-        $this->actingAs($usuario);
-    }
+        $usuario->forceFill([
+            'perfil' => 'leitor'
+        ])->save();
 
+        $this->assertSame(
+            'leitor',
+            $usuario->fresh()->perfil
+        );
+
+        $this->actingAs($usuario->fresh());
+    }
     private function criarProduto(string $nome): Produto
     {
         return Produto::create([
