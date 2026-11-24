@@ -13,12 +13,10 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        Gate::define('produtos.visualizar', fn(User $user): bool => in_array($user->perfil,['leitor', 'operador', 'administrador'], true));
+        Gate::define('produtos.cadastrar', fn(User $user): bool => in_array($user->perfil,['operador', 'administrador'], true));
+        Gate::define('produtos.excluir', fn(User $user): bool => in_array($user->perfil === 'administrador'));
     }
 }

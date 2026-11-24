@@ -150,4 +150,23 @@ class ProdutoWriteHttpTest extends TestCase
             'codigo_barras' => '07891234567890'
         ]);
     }
+    public function test_usuario_comum_nao_pode_criar_produto(): void
+    {
+        $usuario = User::create([
+            'name' => 'Usuario Comum',
+            'email' => 'comum@gennus.test',
+            'password' => 'SenhaSegura123'
+        ]);
+
+        $this->actingAs($usuario);
+
+        $this->postJson(
+            '/php/produto_novo.php',
+            $this->dados()
+        )->assertForbidden();
+
+        $this->assertDatabaseMissing('produtos', [
+            'nome' => 'Mouse Gamer'
+        ]);
+    }
 }
