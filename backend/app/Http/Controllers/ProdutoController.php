@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Modules\Produtos\Actions\CreateProduto;
 use App\Modules\Produtos\Actions\UpdateProduto;
 use App\Modules\Produtos\Actions\DeleteProduto;
+use App\Modules\Produtos\Actions\RestoreProduto;
+use DomainException;
 
 
 
@@ -97,7 +99,7 @@ final class ProdutoController extends Controller
     {
         try {
             $id = $this->validarId($request);
-            $action->execute($id);
+            $action->execute($id, $request->user());
             return response()->json([
                 'status' => 'ok',
                 'mensagem' => 'Produto arquvido com sucesso',
@@ -107,6 +109,24 @@ final class ProdutoController extends Controller
             return $this->erro($e->validator->errors()->first(), 422);
         } catch (ModelNotFoundException $e){
             return $this->erro('Produto nao encontrado', 404);
+        }
+    }
+    public function restore(Request $request, RestoreProduto $action): JsonResponse
+    {
+        try {
+            $id = $this->validarId($request);
+            $produto = $action->execute($id, $request->user());
+            return response()->json([
+                'status' => 'ok',
+                'mensagem' => 'Produto restaurado com sucesso',
+                'data' => $produto,
+            ]);
+        } catch (ValidationException $e){
+            return $this->erro($e->errors()?collect($e->errors())->flatten()->first() : 'Dados invalidos.', 422);
+        } catch (ModelNotFoundException $e){
+            return $this->erro('produto nao encontrado.', 404);
+        } catch (DomainException $e){
+            return $this->erro($e->getMessage(), 410);
         }
     }
     private function validarId(Request $request): int

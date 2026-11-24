@@ -7,6 +7,7 @@ use App\Modules\Produtos\Actions\DeleteProduto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
 
 class DeleteProdutoTest extends TestCase
 {
@@ -28,7 +29,7 @@ class DeleteProdutoTest extends TestCase
     {
         $produto = $this->criarProduto();
 
-        (new DeleteProduto())->execute($produto->id);
+        (new DeleteProduto())->execute($produto->id, $this->$operador);
 
         $this->assertSoftDeleted('produtos', [
             'id' => $produto->id
@@ -43,7 +44,7 @@ class DeleteProdutoTest extends TestCase
     {
         $produto = $this->criarProduto();
 
-        (new DeleteProduto())->execute($produto->id);
+        (new DeleteProduto())->execute($produto->id, $this->$operador);
 
         $arquivado = Produto::withTrashed()
             ->find($produto->id);
@@ -58,7 +59,7 @@ class DeleteProdutoTest extends TestCase
         $primeiro = $this->criarProduto('Mouse');
         $segundo = $this->criarProduto('Teclado');
 
-        (new DeleteProduto())->execute($primeiro->id);
+        (new DeleteProduto())->execute($primeiro->id, $this->$operador);
 
         $this->assertNotNull(
             Produto::find($segundo->id)
@@ -76,5 +77,21 @@ class DeleteProdutoTest extends TestCase
         );
 
         (new DeleteProduto())->execute(999999);
+    }
+    private User $operador;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->operador = User::create([
+            'name' => 'Operador Teste',
+            'email' => 'operador@gennus.test',
+            'password' => 'SenhaSegura123',
+        ]);
+
+        $this->operador->forceFill([
+            'perfil' => 'operador',
+        ])->save();
     }
 }

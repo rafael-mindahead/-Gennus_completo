@@ -37,4 +37,8 @@ Route::middleware('auth')->group(function () {
         '/php/produto_excluir.php',
         [ProdutoController::class, 'destroy']
     )->middleware('can:produtos.excluir');
+    Route::post(
+        '/php/produto_restaurar.php',
+        [ProdutoController::class, 'restore']
+    )->middleware('can:produtos.restaurar');
 });
