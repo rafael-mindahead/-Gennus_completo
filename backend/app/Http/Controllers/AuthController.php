@@ -29,7 +29,8 @@ final class AuthController extends Controller
     {
         try {
             $usuario = $action->execute(
-                $request->all()
+                $request->all(),
+                $request->user()
             );
 
             return response()->json([
