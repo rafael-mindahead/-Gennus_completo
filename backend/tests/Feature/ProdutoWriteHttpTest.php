@@ -8,7 +8,6 @@ use Tests\TestCase;
 class ProdutoWriteHttpTest extends TestCase
 {
     use RefreshDatabase;
-
     private function autenticar(): void
     {
         $usuario = User::create([
@@ -17,9 +16,17 @@ class ProdutoWriteHttpTest extends TestCase
             'password' => 'SenhaSegura123'
         ]);
 
-        $this->actingAs($usuario);
-    }
+        $usuario->forceFill([
+            'perfil' => 'administrador'
+        ])->save();
 
+        $this->assertSame(
+            'administrador',
+            $usuario->fresh()->perfil
+        );
+
+        $this->actingAs($usuario->fresh());
+    }
     private function dados(): array
     {
         return [

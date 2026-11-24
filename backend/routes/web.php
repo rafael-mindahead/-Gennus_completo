@@ -22,19 +22,19 @@ Route::middleware('auth')->group(function () {
     Route::get(
         '/php/produto_get.php',
         [ProdutoController::class, 'index']
-    );
+    )->middleware('can:produtos.visualizar');
     Route::post(
         '/php/produto_novo.php',
         [ProdutoController::class, 'store']
-    );
+    )->middleware('can:produtos.gravar');
 
     Route::post(
         '/php/produto_alterar.php',
         [ProdutoController::class, 'update']
-    );
+    )->middleware('can:produtos.gravar');
 
     Route::post(
         '/php/produto_excluir.php',
         [ProdutoController::class, 'destroy']
-    );
+    )->middleware('can:produtos.excluir');
 });
