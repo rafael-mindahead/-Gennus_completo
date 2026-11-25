@@ -12,7 +12,8 @@ final class LoginUser
     {
         $autenticado = Auth::attempt([
             'email' => $email,
-            'password' => $senha
+            'password' => $senha,
+            'bloqueado_em' => null,
         ]);
 
         if (!$autenticado){
