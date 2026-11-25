@@ -1,9 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 use App\Modules\Usuarios\Actions\ListUsers;
+use App\Modules\Usuarios\Actions\BloquearUsuario;
+use App\Modules\Usuarios\Actions\DesbloquearUsuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 final class UsuarioController extends Controller
 {
     public function index(Request $request, ListUsers $action): JsonResponse
@@ -35,4 +36,36 @@ final class UsuarioController extends Controller
             ],
         ]);
     } 
+    public function bloquear(Request $request, BloquearUsuario $action): JsonResponse
+    {
+        $dados = $request->validate([
+            'usuario_id' => [
+                'required', 
+                'integer',
+                'min:1',
+            ]
+        ]);
+        $action->execute($request->user(), (int)$dados['usuario_id']);
+        return response()->json([
+            'status' => 'ok',
+            'mensagem' => 'Usuaerio desbloqueado com sucesso.',
+            'data' => [],
+        ]);
+    }
+    public function desbloquear(Request $request, DesbloquearUsuario $action): JsonResponse
+    {
+        $dados = $request->validate([
+            'usuario_id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+        ]);
+        $action->execute($request->user(), (int)$dados['usuario_id']);
+        return response()->json([
+            'status' => 'ok',
+            'mensagem' => 'Usuario desbloqueado com sucesso.',
+            'data' => [],
+        ]);
+    }
 }

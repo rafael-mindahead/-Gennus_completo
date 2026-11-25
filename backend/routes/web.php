@@ -48,4 +48,12 @@ Route::middleware('auth')->group(function () {
         '/php/usuarios_get.php',
         [UsuarioController::class, 'index']
     )->middleware('can:usuarios.gerenciar');
+    Route::post(
+        '/php/usuario_bloquear.php',
+        [UsuarioController::class, 'bloquear']
+    )->middleware('can:usuarios.gerenciar');
+    Route::post(
+        '/php/usuario_desbloquear.php',
+        [UsuarioController::class, 'desbloquear']
+    )->middleware('can:usuarios.gerenciar');
 });
