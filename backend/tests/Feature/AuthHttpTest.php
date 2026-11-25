@@ -21,18 +21,17 @@ class AuthHttpTest extends TestCase
 
     public function test_cadastro_http(): void
     {
-
-        $administrador = User::create([
-            'name' => 'Administrador Teste',
-            'email' => 'admin@gennus.test',
+        $gestor = User::create([
+            'name' => 'Gestor Teste',
+            'email' => 'gestor@gennus.test',
             'password' => 'SenhaSegura123',
         ]);
 
-        $administrador->forceFill([
+        $gestor->forceFill([
             'perfil' => 'administrador',
         ])->save();
 
-        $this->actingAs($administrador->fresh());
+        $this->actingAs($gestor->fresh());
 
         $this->post('/php/usuario_novo.php', [
             'nome' => 'Ana',
@@ -40,12 +39,15 @@ class AuthHttpTest extends TestCase
             'email_corporativo' => 'ana@gennus.test',
             'telefone' => '41999999999',
             'cpf_cnpj' => '',
-            'senha' => 'SenhaSegura123'
-        ])->assertCreated()
-          ->assertJsonPath('status', 'ok');
+            'senha' => 'SenhaSegura123',
+            'perfil' => 'operador',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('status', 'ok');
 
         $this->assertDatabaseHas('users', [
-            'email' => 'ana@gennus.test'
+            'email' => 'ana@gennus.test',
+            'perfil' => 'operador',
         ]);
     }
 

@@ -1,7 +1,6 @@
 <?php
-
 namespace Tests\Feature;
-
+use App\Models\User;
 use App\Modules\Auth\Actions\RegisterUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +19,7 @@ class RegisterUserTest extends TestCase
             'email_corporativo' => 'ana@gennus.test',
             'telefone' => '41999999999',
             'cpf_cnpj' => '',
+            'perfil' => 'operador',
             'senha' => 'SenhaSegura123'
         ];
     }
@@ -27,7 +27,7 @@ class RegisterUserTest extends TestCase
     public function test_cadastra_usuario(): void
     {
         $usuario = (new RegisterUser())
-            ->execute($this->dadosValidos());
+            ->execute($this->dadosValidos(), $this->gestor);
 
         $this->assertNotNull($usuario->id);
 
@@ -49,13 +49,13 @@ class RegisterUserTest extends TestCase
     {
         $action = new RegisterUser();
 
-        $action->execute($this->dadosValidos());
+        $action->execute($this->dadosValidos(), $this->gestor);
 
         $this->expectException(
             ValidationException::class
         );
 
-        $action->execute($this->dadosValidos());
+        $action->execute($this->dadosValidos(), $this->gestor);
     }
 
     public function test_rejeita_senha_curta(): void
@@ -67,6 +67,24 @@ class RegisterUserTest extends TestCase
             ValidationException::class
         );
 
-        (new RegisterUser())->execute($dados);
+        (new RegisterUser())->execute($dados, $this->gestor);
+    }
+    private User $gestor;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->gestor = User::create([
+            'name' => 'Gestor Teste',
+            'email' => 'gestor@gennus.test',
+            'password' => 'SenhaSegura123',
+        ]);
+
+        $this->gestor->forceFill([
+            'perfil' => 'administrador',
+        ])->save();
+
+        $this->gestor = $this->gestor->fresh();
     }
 }

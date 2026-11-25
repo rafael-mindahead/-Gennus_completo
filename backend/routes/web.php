@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\UsuarioController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,14 +11,11 @@ Route::get('/', function () {
 
 Route::get('/php/csrf.php', [AuthController::class, 'csrf']);
 
-Route::post('/php/usuario_novo.php', [AuthController::class, 'register'])->middleware('throttle:5,1');
-
 Route::post('/php/usuario_login.php', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::get('/php/valida_sessao.php', [AuthController::class, 'session']);
 
 Route::post('/php/cliente_logoff.php', [AuthController::class, 'logout']);
-Route::post('/php/usuario_novo.php',[AuthController::class, 'register'])->middleware('throttle:5,1');
 
 Route::middleware('auth')->group(function () {
     Route::get(
@@ -46,4 +44,8 @@ Route::middleware('auth')->group(function () {
         '/php/usuario_novo.php',
         [AuthController::class, 'register']
     )->middleware(['can:usuarios.criar', 'throttle:5,1']);
+    Route::get(
+        '/php/usuarios_get.php',
+        [UsuarioController::class, 'index']
+    )->middleware('can:usuarios.gerenciar');
 });
