@@ -15,6 +15,8 @@ final class ListUsers
             'email',
             'perfil',
             'created_at',
+            'situacao_funcional',
+            'bloqueado_em',
         ])->orderBy('id')->paginate($porPagina)->through(
             fn(User $usuario) => [
                 'id' => $usuario->id,
@@ -23,6 +25,8 @@ final class ListUsers
                 'email_corporativo' => $usuario->email,
                 'perfil' => $usuario->perfil,
                 'criado_em' => $usuario->created_at?->toIso8601String(),
+                'situacao_funcional' => $usuario->situacao_funcional,
+                'bloqueado' => $usuario->bloqueado_em !== null,
             ]
         );
     }

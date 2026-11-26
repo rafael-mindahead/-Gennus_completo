@@ -60,4 +60,8 @@ Route::middleware('auth')->group(function () {
         '/php/usuario_situacao.php',
         [UsuarioController::class, 'alterarSituacao']
     )->middleware('can:usuarios.gerenciar');
+    Route::post(
+        '/php/usuario_perfil.php',
+        [UsuarioController::class, 'alterarPerfil']
+    )->middleware('can:usuarios.gerenciar');
 });

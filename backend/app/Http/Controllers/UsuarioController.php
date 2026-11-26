@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Modules\Usuarios\Actions\AlterarSituacaoFuncional;
 use Illuminate\Validation\Rule;
+use App\Modules\Usuarios\Actions\AlterarPerfilUsuario;
 final class UsuarioController extends Controller
 {
     public function index(Request $request, ListUsers $action): JsonResponse
@@ -50,7 +51,7 @@ final class UsuarioController extends Controller
         $action->execute($request->user(), (int)$dados['usuario_id']);
         return response()->json([
             'status' => 'ok',
-            'mensagem' => 'Usuaerio desbloqueado com sucesso.',
+            'mensagem' => 'Usuário bloqueado com sucesso.',
             'data' => [],
         ]);
     }
@@ -99,6 +100,37 @@ final class UsuarioController extends Controller
         return response()->json([
             'status' => 'ok',
             'mensagem' => 'Situação funcional atualizada.',
+            'data' => [],
+        ]);
+    }
+    public function alterarPerfil(
+        Request $request,
+        AlterarPerfilUsuario $action
+    ): JsonResponse {
+        $dados = $request->validate([
+            'usuario_id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+            'perfil' => [
+                'required',
+                Rule::in([
+                    'operador',
+                    'leitor',
+                ]),
+            ],
+        ]);
+
+        $action->execute(
+            $request->user(),
+            (int) $dados['usuario_id'],
+            $dados['perfil']
+        );
+
+        return response()->json([
+            'status' => 'ok',
+            'mensagem' => 'Perfil atualizado com sucesso.',
             'data' => [],
         ]);
     }
