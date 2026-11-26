@@ -56,4 +56,8 @@ Route::middleware('auth')->group(function () {
         '/php/usuario_desbloquear.php',
         [UsuarioController::class, 'desbloquear']
     )->middleware('can:usuarios.gerenciar');
+    Route::post(
+        '/php/usuario_situacao.php',
+        [UsuarioController::class, 'alterarSituacao']
+    )->middleware('can:usuarios.gerenciar');
 });
