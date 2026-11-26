@@ -14,6 +14,7 @@ final class LoginUser
             'email' => $email,
             'password' => $senha,
             'bloqueado_em' => null,
+            'situacao_funcional' => ['ativo', 'inativo'],
         ]);
 
         if (!$autenticado){

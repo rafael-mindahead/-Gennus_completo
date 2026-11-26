@@ -13,7 +13,7 @@ final class GarantirContaDesbloqueada
         if (Auth::check()){
             $usuario = User::query()->find(Auth::id());
 
-            if ($usuario === null || $usuario->bloqueado_em !== null){
+            if ($usuario === null || $usuario->bloqueado_em !== null || !in_array($usuario->situacao_funcional, ['ativo', 'inativo'], true)){
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
