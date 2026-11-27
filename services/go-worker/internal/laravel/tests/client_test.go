@@ -1,4 +1,4 @@
-package laravel
+package tests
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/rafael-mindahead/-Gennus_completo/services/go-worker/internal/laravel"
 )
 
 func TestEnviarMovimentacao(t *testing.T) {
@@ -40,7 +42,7 @@ func TestEnviarMovimentacao(t *testing.T) {
 						t.Error("Content-Type incorreto")
 					}
 
-					var evento Evento
+					var evento laravel.Evento
 
 					if err := json.NewDecoder(r.Body).Decode(&evento); err != nil {
 						t.Errorf("JSON inválido: %v", err)
@@ -59,7 +61,7 @@ func TestEnviarMovimentacao(t *testing.T) {
 			)
 			defer servidor.Close()
 
-			cliente := NovoCliente(
+			cliente := laravel.NovoCliente(
 				servidor.URL,
 				"token-de-teste",
 				servidor.Client(),
@@ -67,7 +69,7 @@ func TestEnviarMovimentacao(t *testing.T) {
 
 			codigo, err := cliente.Enviar(
 				context.Background(),
-				Evento{
+				laravel.Evento{
 					EventoID:        "550e8400-e29b-41d4-a716-446655440000",
 					DispositivoID:   1,
 					CodigoBarras:    "7900000000001",
