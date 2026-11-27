@@ -60,9 +60,9 @@ func (c *Cliente) Enviar(ctx context.Context, evento Evento) (int, error) {
 	}
 	defer resp.Body.Close()
 	switch resp.StatusCode {
-	case http.StatusOK, http.StatusCreated, http.StatusAccepted:
+	case http.StatusOK, http.StatusCreated:
 		return resp.StatusCode, nil
 	default:
-		return resp.StatusCode, fmt.Errorf("Laravel retornou http %d", resp.StatusCode)
+		return resp.StatusCode, &ErroHTTP{Codigo: resp.StatusCode}
 	}
 }
