@@ -23,6 +23,7 @@ type Cliente struct {
 	baseURL    string
 	token      string
 	httpClient *http.Client
+	limitador  *LimitadorTaxa
 }
 
 // Novo cliente configura o cliente de integracao
@@ -39,11 +40,24 @@ func NovoCliente(baseURL string, token string, httpClient *http.Client) *Cliente
 	}
 }
 
+// NovoClienteComLimitador configura o cliente de integracao com limitador de taxa
+func NovoClienteComLimitador(baseURL string, token string, httpClient *http.Client, limitador *LimitadorTaxa) *Cliente {
+	cliente := NovoCliente(baseURL, token, httpClient)
+	cliente.limitador = limitador
+	return cliente
+}
+
 // Enviar trasmite um evento para o laravel e retorn o status code da resposta
 func (c *Cliente) Enviar(ctx context.Context, evento Evento) (int, error) {
 	corpo, err := json.Marshal(evento) // Marshal transforma o evento em json
 	if err != nil {
 		return 0, fmt.Errorf("erro ao serializar evento: %w", err)
+	}
+	//aguarda a permissao antes de iniciar uma nova tentativa de envio
+	if c.limitador != nil {
+		if err := c.limitador.Aguardar(ctx); err != nil {
+			return 0, fmt.Errorf("Aguardando rate limiter: %w", err)
+		}
 	}
 	ctx, cancelar := context.WithTimeout(ctx, 10*time.Second)
 	defer cancelar()
