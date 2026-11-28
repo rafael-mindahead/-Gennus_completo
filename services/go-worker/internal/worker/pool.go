@@ -74,9 +74,8 @@ func (p *Pool) Processar(ctx context.Context, eventos <-chan laravel.Evento) <-c
 						Err:    err,
 					}
 					// entrega o resultado ou encerra se o contexto for cancelado
-					select {
-					case resultados <- resultado:
-					case <-ctx.Done():
+					resultados <- resultado
+					if ctx.Err() != nil {
 						return
 					}
 				}
